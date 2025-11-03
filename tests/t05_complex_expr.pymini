@@ -1,0 +1,22 @@
+# Test 05: Expresiones complejas con múltiples operadores
+a = 10
+b = 5
+c = 2
+
+# Prueba de precedencia y asociatividad
+result = a + b * c - a / b
+print(result)
+
+# Prueba de operadores lógicos
+x = True
+y = False
+z = x and y or not y
+print(z)
+
+# Comparaciones
+test1 = a > b
+test2 = b <= c
+test3 = a == 10
+print(test1)
+print(test2)
+print(test3)

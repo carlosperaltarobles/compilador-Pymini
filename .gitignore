@@ -1,0 +1,37 @@
+# Archivos generados por el compilador
+pymini
+*.o
+
+# Archivos generados por Flex y Bison
+lex.yy.c
+y.tab.c
+y.tab.h
+y.output
+
+# Archivos de backup
+*~
+*.swp
+*.swo
+
+# Archivos temporales
+*.tmp
+/tmp/
+
+# Directorios de build
+build/
+dist/
+
+# Archivos de debug
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Archivos de IDEs
+.vscode/
+.idea/
+*.sublime-*
+.DS_Store
+
+# Archivos de sistema
+Thumbs.db

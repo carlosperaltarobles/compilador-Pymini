@@ -1,0 +1,19 @@
+# Test 06: Condicional completo con elif
+score = 85
+
+if score >= 90:
+{
+  print(True)
+}
+elif score >= 80:
+{
+  print(True)
+}
+elif score >= 70:
+{
+  print(False)
+}
+else:
+{
+  print(False)
+}

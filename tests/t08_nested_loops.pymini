@@ -1,0 +1,13 @@
+# Test 08: Bucles anidados
+i = 0
+while i < 3:
+{
+  j = 0
+  while j < 2:
+  {
+    print(i)
+    print(j)
+    j = j + 1
+  }
+  i = i + 1
+}
