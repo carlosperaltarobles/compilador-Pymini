@@ -1,7 +1,6 @@
 # Error: condición de while debe ser bool
 i = 0
 while i:
-{
-  print(i)
-  i = i + 1
-}
+    print(i)
+    i = i + 1
+

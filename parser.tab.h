@@ -78,14 +78,15 @@ extern int yydebug;
     ASSIGN = 279,                  /* ASSIGN  */
     LPAREN = 280,                  /* LPAREN  */
     RPAREN = 281,                  /* RPAREN  */
-    LBRACE = 282,                  /* LBRACE  */
-    RBRACE = 283,                  /* RBRACE  */
-    COLON = 284,                   /* COLON  */
-    COMMA = 285,                   /* COMMA  */
-    INT_LIT = 286,                 /* INT_LIT  */
-    BOOL_LIT = 287,                /* BOOL_LIT  */
-    IDENT = 288,                   /* IDENT  */
-    UNARY = 289                    /* UNARY  */
+    COLON = 282,                   /* COLON  */
+    COMMA = 283,                   /* COMMA  */
+    INDENT = 284,                  /* INDENT  */
+    DEDENT = 285,                  /* DEDENT  */
+    NEWLINE = 286,                 /* NEWLINE  */
+    INT_LIT = 287,                 /* INT_LIT  */
+    BOOL_LIT = 288,                /* BOOL_LIT  */
+    IDENT = 289,                   /* IDENT  */
+    UNARY = 290                    /* UNARY  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -94,7 +95,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 42 "src/parser.y"
+#line 43 "src/parser.y"
 
     int int_val;
     bool bool_val;
@@ -102,7 +103,7 @@ union YYSTYPE
     Ast* ast_node;
     OpKind op_kind;
 
-#line 106 "parser.tab.h"
+#line 107 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

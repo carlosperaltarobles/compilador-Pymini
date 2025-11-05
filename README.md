@@ -23,7 +23,7 @@ PyMini es un compilador educativo para un subconjunto simple de Python, implemen
 
 ## ¿Qué es PyMini?
 
-PyMini es un **compilador completo en C** que procesa un subconjunto de Python. Actualmente en **Fases 1-4**, el compilador puede:
+PyMini es un **compilador completo en C** que procesa un subconjunto de Python. Actualmente en **Fase Final (Fase 5)**, el compilador incluye:
 
 **Fase 1 - Análisis Léxico y Sintáctico:**
 - **Leer** tu código fuente  
@@ -51,7 +51,14 @@ PyMini es un **compilador completo en C** que procesa un subconjunto de Python. 
 - **Optimizaciones** básicas (constant folding, dead code elimination)
 - **Ejecución** directa de programas PyMini
 
-**En resumen:** PyMini es un compilador completo que puede ejecutar programas, generando ejecutables nativos optimizados.
+**Fase 5 - Sintaxis Python con Indentación:**
+- **Indentación significativa** estilo Python (sin llaves `{}`)
+- **Tokens INDENT/DEDENT/NEWLINE** para bloques de código
+- **Detección de errores** de indentación (tabs mezclados, niveles inconsistentes)
+- **Sintaxis 100% compatible** con Python para estructuras de control
+- **Manejo robusto** de bloques anidados y múltiples niveles de dedent
+
+**En resumen:** PyMini es un compilador completo que acepta sintaxis Python con indentación, genera ejecutables nativos optimizados y proporciona mensajes de error detallados.
 
 ---
 
@@ -199,13 +206,11 @@ cat > demo.pymini << 'EOF'
 # Programa de demostración PyMini
 # Calcula el factorial de un número
 
-def factorial(n): {
-    if n <= 1: {
+def factorial(n):
+    if n <= 1:
         return 1
-    } else: {
+    else:
         return n * factorial(n - 1)
-    }
-}
 
 x = 5
 result = factorial(x)
@@ -383,30 +388,27 @@ PyMini soporta un subconjunto de Python con las siguientes características:
 
 **Condicionales**:
 ```python
-if condicion: {
+if condicion:
     # código
-} elif otra_condicion: {
+elif otra_condicion:
     # código
-} else: {
+else:
     # código
-}
 ```
 
 **Bucles**:
 ```python
-while condicion: {
+while condicion:
     # código
-}
 ```
 
 ### Funciones
 
 **Definición**:
 ```python
-def nombre_funcion(param1, param2): {
+def nombre_funcion(param1, param2):
     # código
     return valor
-}
 ```
 
 **Llamada**:
@@ -448,13 +450,12 @@ print(z)  # Imprime: 50
 # Verificar si un número es positivo, negativo o cero
 num = -5
 
-if num > 0: {
+if num > 0:
     print(1)  # Positivo
-} elif num < 0: {
+elif num < 0:
     print(-1)  # Negativo
-} else: {
+else:
     print(0)  # Cero
-}
 ```
 
 ### Ejemplo 3: Bucles
@@ -464,10 +465,9 @@ if num > 0: {
 suma = 0
 i = 1
 
-while i <= 10: {
+while i <= 10:
     suma = suma + i
     i = i + 1
-}
 
 print(suma)  # Imprime: 55
 ```
@@ -476,13 +476,11 @@ print(suma)  # Imprime: 55
 
 ```python
 # Función que calcula el máximo de dos números
-def max(a, b): {
-    if a > b: {
+def max(a, b):
+    if a > b:
         return a
-    } else: {
+    else:
         return b
-    }
-}
 
 resultado = max(15, 23)
 print(resultado)  # Imprime: 23
@@ -492,13 +490,11 @@ print(resultado)  # Imprime: 23
 
 ```python
 # Cálculo recursivo del factorial
-def factorial(n): {
-    if n <= 1: {
+def factorial(n):
+    if n <= 1:
         return 1
-    } else: {
+    else:
         return n * factorial(n - 1)
-    }
-}
 
 f5 = factorial(5)
 print(f5)  # Imprime: 120
@@ -508,13 +504,11 @@ print(f5)  # Imprime: 120
 
 ```python
 # Fibonacci recursivo
-def fib(n): {
-    if n <= 1: {
+def fib(n):
+    if n <= 1:
         return n
-    } else: {
+    else:
         return fib(n - 1) + fib(n - 2)
-    }
-}
 
 resultado = fib(7)
 print(resultado)  # Imprime: 13
@@ -524,35 +518,65 @@ print(resultado)  # Imprime: 13
 
 ```python
 # Programa que calcula si un número es primo
-def es_primo(n): {
-    if n <= 1: {
+def es_primo(n):
+    if n <= 1:
         return False
-    }
-    if n == 2: {
+    if n == 2:
         return True
-    }
     
     i = 2
-    while i * i <= n: {
-        if n % i == 0: {
+    while i * i <= n:
+        if n % i == 0:
             return False
-        }
         i = i + 1
-    }
     
     return True
-}
 
 # Probar con varios números
 num = 17
-if es_primo(num): {
+if es_primo(num):
     print(1)  # Es primo
-} else: {
+else:
     print(0)  # No es primo
-}
 ```
 
 Para más ejemplos avanzados, consulta `docs/EXAMPLES.md`.
+
+---
+
+## Herramientas Incluidas
+
+### Convertir Código Antiguo (con llaves `{}`)
+
+Si tienes código PyMini antiguo que usa llaves `{}` en lugar de indentación, puedes convertirlo automáticamente:
+
+```bash
+# Convertir todos los archivos .pymini en el proyecto
+python3 convert_syntax.py
+```
+
+**¿Qué hace el script?**
+- Encuentra todos los archivos `.pymini` en el proyecto
+- Convierte la sintaxis de `{}` a indentación Python
+- Crea copias de seguridad con extensión `.bak`
+- Maneja correctamente: `if/elif/else`, `while`, `def`, bloques anidados
+
+**Ejemplo de conversión:**
+
+Antes (sintaxis antigua con `{}`):
+```python
+if x > 0: {
+  print(x)
+}
+```
+
+Después (sintaxis Python con indentación):
+```python
+if x > 0:
+    print(x)
+```
+
+**Nota:** Todos los archivos de ejemplo y tests ya están actualizados a la nueva sintaxis.
 
 ---
 
@@ -831,6 +855,14 @@ para información más técnica y ejemplos avanzados:
 - Dead code elimination (eliminación de código muerto)
 - Tests end-to-end con verificación de salida
 - Modo verbose para debugging del compilador
+
+### Fase 5 - Indentación Pythonica ✨ **NUEVO**
+- **Indentación significativa**: Los bloques se delimitan con indentación en lugar de llaves `{}`
+- **100% compatible con Python**: La sintaxis es ahora idéntica a Python real
+- **Tokens especiales**: INDENT, DEDENT, NEWLINE para manejar la estructura
+- **Detección de errores**: Detecta mezcla de tabs/espacios, indentación inconsistente
+- **Conversión automática**: Script incluido para convertir código antiguo con `{}`
+- **Documentación completa**: Ver `docs/FASE_5_INDENTACION.md` para detalles técnicos
 
 
 

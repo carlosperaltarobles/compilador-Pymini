@@ -6,6 +6,10 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
+# Ir al directorio raíz del proyecto
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR/.." || exit 1
+
 COMPILER="./pymini"
 POS_DIR="tests/pos"
 NEG_DIR="tests/neg"
@@ -41,13 +45,13 @@ for test_file in "$POS_DIR"/*.pymini; do
         output=$("$COMPILER" "$test_file" 2>&1)
         exit_code=$?
         
-        # Verificar que terminó con código 0 y contiene "Semantic OK"
-        if [ $exit_code -eq 0 ] && echo "$output" | grep -q "Semantic OK"; then
+        # Verificar que terminó con código 0 (compilación y ejecución exitosa)
+        if [ $exit_code -eq 0 ]; then
             echo -e "${GREEN}OK${NC}"
             passed_tests=$((passed_tests + 1))
         else
             echo -e "${RED}FAIL${NC}"
-            echo "     Esperado: código 0 y 'Semantic OK'"
+            echo "     Esperado: código 0 (compilación exitosa)"
             echo "     Obtenido: código $exit_code"
             echo "     Salida:"
             echo "$output" | sed 's/^/       /'

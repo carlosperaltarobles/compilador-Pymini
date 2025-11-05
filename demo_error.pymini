@@ -3,3 +3,4 @@
 
 x = 5
 print(y)  # Error: 'y' no está declarada
+

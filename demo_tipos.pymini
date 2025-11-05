@@ -3,3 +3,4 @@
 x = 5
 y = True
 z = x and y  # Error: no se puede usar 'and' con int y bool
+

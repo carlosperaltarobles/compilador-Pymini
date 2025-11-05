@@ -7,7 +7,8 @@
 #include "src/ast.h"
 
 /* Declaraciones externas */
-extern int yylex(void);
+extern int real_yylex(void);  /* Wrapper personalizado */
+#define yylex real_yylex      /* Redirigir llamadas a nuestro wrapper */
 extern int yyline;
 extern int yycolumn;
 extern FILE* yyin;
@@ -62,7 +63,10 @@ Location make_location(int line, int col) {
 %token TOK_PLUS TOK_MINUS TOK_STAR TOK_SLASH TOK_MOD
 
 /* Símbolos */
-%token ASSIGN LPAREN RPAREN LBRACE RBRACE COLON COMMA
+%token ASSIGN LPAREN RPAREN COLON COMMA
+
+/* Indentación (reemplazan LBRACE/RBRACE) */
+%token INDENT DEDENT NEWLINE
 
 /* Literales e identificadores */
 %token <int_val> INT_LIT
@@ -112,16 +116,20 @@ stmt_list:
     | stmt_list stmt
         { 
             $$ = $1;
-            ast_stmt_list_add($$, $2);
+            if ($2 != NULL) {  /* ignorar líneas vacías */
+                ast_stmt_list_add($$, $2);
+            }
         }
     ;
 
 /* Sentencia genérica */
 stmt:
-    simple_stmt
+    simple_stmt NEWLINE
         { $$ = $1; }
     | compound_stmt
         { $$ = $1; }
+    | NEWLINE
+        { $$ = NULL; /* línea vacía, ignorar */ }
     ;
 
 /* Sentencias simples */
@@ -169,8 +177,8 @@ compound_stmt:
 
 /* Condicional if */
 if_stmt:
-    KW_IF expr COLON block elif_list opt_else
-        { $$ = ast_new_if($2, $4, $5, $6, LOC); }
+    KW_IF expr COLON NEWLINE block elif_list opt_else
+        { $$ = ast_new_if($2, $5, $6, $7, LOC); }
     ;
 
 /* Lista de elif (puede estar vacía) */
@@ -190,36 +198,36 @@ elif_list:
 
 /* Cláusula elif individual */
 elif_clause:
-    KW_ELIF expr COLON block
-        { $$ = ast_new_elif($2, $4, LOC); }
+    KW_ELIF expr COLON NEWLINE block
+        { $$ = ast_new_elif($2, $5, LOC); }
     ;
 
 /* Else opcional */
 opt_else:
     /* vacío */
         { $$ = NULL; }
-    | KW_ELSE COLON block
-        { $$ = ast_new_else($3, LOC); }
+    | KW_ELSE COLON NEWLINE block
+        { $$ = ast_new_else($4, LOC); }
     ;
 
 /* Bucle while */
 while_stmt:
-    KW_WHILE expr COLON block
-        { $$ = ast_new_while($2, $4, LOC); }
+    KW_WHILE expr COLON NEWLINE block
+        { $$ = ast_new_while($2, $5, LOC); }
     ;
 
 /* Definición de función */
 func_def:
-    KW_DEF IDENT LPAREN opt_params RPAREN COLON block
+    KW_DEF IDENT LPAREN opt_params RPAREN COLON NEWLINE block
         { 
-            $$ = ast_new_func_def($2, $4, $7, LOC);
+            $$ = ast_new_func_def($2, $4, $8, LOC);
             free($2);
         }
     ;
 
 /* Bloque de código */
 block:
-    LBRACE stmt_list RBRACE
+    INDENT stmt_list DEDENT
         { $$ = ast_new_block($2, LOC); }
     ;
 

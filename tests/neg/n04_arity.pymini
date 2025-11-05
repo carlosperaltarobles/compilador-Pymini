@@ -1,6 +1,5 @@
 # Error: aridad incorrecta
 def a(b,c):
-{
-  return b
-}
+    return b
 print(a(1))
+

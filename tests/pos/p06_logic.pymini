@@ -5,3 +5,4 @@ c = a and b
 d = a or b
 e = not c
 print(e)
+

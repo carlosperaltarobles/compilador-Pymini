@@ -1,7 +1,6 @@
 # Test 03: Bucle while
 x = 0
 while x < 3:
-{
-  print(x)
-  x = x + 1
-}
+    print(x)
+    x = x + 1
+

@@ -1,10 +1,7 @@
 # Test 02: Condicional if-else
 x = 5
 if x > 3:
-{
-  print(True)
-}
+    print(True)
 else:
-{
-  print(False)
-}
+    print(False)
+
