@@ -10,7 +10,7 @@ fi
 
 INPUT_FILE="$1"
 GOLDEN_FILE="${INPUT_FILE}.golden"
-COMPILER="./pymini"
+COMPILER="./bin/pymini"
 
 # Verificar que el compilador existe
 if [ ! -f "$COMPILER" ]; then

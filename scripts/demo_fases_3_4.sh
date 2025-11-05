@@ -34,7 +34,7 @@ print_info() {
 }
 
 # Verificar que el compilador existe
-if [ ! -f "./pymini" ]; then
+if [ ! -f "./bin/pymini" ]; then
     echo "Error: Compilador 'pymini' no encontrado"
     echo "Ejecuta 'make' primero"
     exit 1
@@ -42,7 +42,7 @@ fi
 
 # Paso 1: Mostrar versión
 print_step "Paso 1: Información del compilador"
-./pymini --version
+./bin/pymini --version
 print_success "Versión mostrada"
 
 # Paso 2: Ejecutar programa simple
@@ -51,7 +51,7 @@ print_info "Archivo: tests/e2e/pos/e01_hello.pymini"
 cat tests/e2e/pos/e01_hello.pymini
 echo ""
 print_info "Ejecutando:"
-./pymini --run tests/e2e/pos/e01_hello.pymini
+./bin/pymini --run tests/e2e/pos/e01_hello.pymini
 print_success "Programa ejecutado correctamente"
 
 # Paso 3: Generar código C
@@ -59,7 +59,7 @@ print_step "Paso 3: Generar código C (expresiones aritméticas)"
 print_info "Archivo: tests/e2e/pos/e02_arith.pymini"
 cat tests/e2e/pos/e02_arith.pymini
 echo ""
-./pymini --emit-c -o /tmp/demo_arith.c tests/e2e/pos/e02_arith.pymini
+./bin/pymini --emit-c -o /tmp/demo_arith.c tests/e2e/pos/e02_arith.pymini
 print_info "Código C generado:"
 cat /tmp/demo_arith.c
 print_success "Código C generado en /tmp/demo_arith.c"
@@ -67,7 +67,7 @@ print_success "Código C generado en /tmp/demo_arith.c"
 # Paso 4: Demostrar optimizaciones
 print_step "Paso 4: Demostrar optimización -O1 (constant folding)"
 print_info "Mismo programa con optimización:"
-./pymini -O1 --emit-c -o /tmp/demo_arith_opt.c tests/e2e/pos/e02_arith.pymini
+./bin/pymini -O1 --emit-c -o /tmp/demo_arith_opt.c tests/e2e/pos/e02_arith.pymini
 print_info "Código C optimizado:"
 cat /tmp/demo_arith_opt.c
 print_info "Nota: '1 + 2 * 3' fue evaluado a '7' en tiempo de compilación"
@@ -79,11 +79,11 @@ print_info "Archivo: tests/e2e/pos/e04_funcs.pymini"
 cat tests/e2e/pos/e04_funcs.pymini
 echo ""
 print_info "Generando código C:"
-./pymini --emit-c -o /tmp/demo_funcs.c tests/e2e/pos/e04_funcs.pymini
+./bin/pymini --emit-c -o /tmp/demo_funcs.c tests/e2e/pos/e04_funcs.pymini
 cat /tmp/demo_funcs.c
 echo ""
 print_info "Ejecutando:"
-./pymini --run tests/e2e/pos/e04_funcs.pymini
+./bin/pymini --run tests/e2e/pos/e04_funcs.pymini
 print_success "Funciones compiladas y ejecutadas correctamente"
 
 # Paso 6: Recursión
@@ -92,12 +92,12 @@ print_info "Archivo: tests/e2e/pos/e06_recursion.pymini"
 cat tests/e2e/pos/e06_recursion.pymini
 echo ""
 print_info "Ejecutando fibonacci(7):"
-./pymini --run tests/e2e/pos/e06_recursion.pymini
+./bin/pymini --run tests/e2e/pos/e06_recursion.pymini
 print_success "Recursión funciona correctamente"
 
 # Paso 7: Compilar a ejecutable
 print_step "Paso 7: Compilar a ejecutable standalone"
-./pymini --compile -o /tmp/demo_programa tests/e2e/pos/e03_if_while.pymini
+./bin/pymini --compile -o /tmp/demo_programa tests/e2e/pos/e03_if_while.pymini
 print_info "Ejecutable generado en /tmp/demo_programa"
 print_info "Ejecutando binario directamente:"
 /tmp/demo_programa
@@ -110,7 +110,7 @@ print_info "Archivo: tests/e2e/neg/e06_divzero.pymini"
 cat tests/e2e/neg/e06_divzero.pymini
 echo ""
 print_info "Ejecutando (debe fallar):"
-./pymini --run tests/e2e/neg/e06_divzero.pymini 2>&1 || true
+./bin/pymini --run tests/e2e/neg/e06_divzero.pymini 2>&1 || true
 print_success "Error de runtime detectado correctamente"
 
 # Paso 9: Suite completa de tests

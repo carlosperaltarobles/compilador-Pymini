@@ -17,8 +17,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR/.." || exit 1
 
 # Verificar que el ejecutable existe
-if [ ! -f "./pymini" ]; then
-    echo "ERROR: El ejecutable './pymini' no existe."
+if [ ! -f "./bin/pymini" ]; then
+    echo "ERROR: El ejecutable './bin/pymini' no existe."
     echo "Por favor, ejecute 'make' primero."
     exit 1
 fi
@@ -38,7 +38,7 @@ for test_file in tests/*.pymini; do
     echo "----------------------------------------"
     
     # Ejecutar el test
-    ./pymini "$test_file" > /tmp/pymini_test_output.txt 2>&1
+    ./bin/pymini "$test_file" > /tmp/pymini_test_output.txt 2>&1
     exit_code=$?
     
     # Verificar el resultado

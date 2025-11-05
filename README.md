@@ -222,7 +222,7 @@ EOF
 #### Paso 2: Compilar el archivo
 
 ```bash
-./pymini demo.pymini
+bin/pymini demo.pymini
 ```
 
 #### Paso 3: Verificar la salida
@@ -261,7 +261,7 @@ EOF
 Compilar:
 
 ```bash
-./pymini demo_error.pymini
+bin/pymini demo_error.pymini
 ```
 
 Salida esperada:
@@ -284,7 +284,7 @@ EOF
 Compilar:
 
 ```bash
-./pymini demo_tipos.pymini
+bin/pymini demo_tipos.pymini
 ```
 
 Salida esperada:
@@ -302,13 +302,13 @@ PyMini ahora soporta múltiples modos de operación:
 ### Modo 1: Compilar y ejecutar (por defecto)
 
 ```bash
-./pymini programa.pymini
+bin/pymini programa.pymini
 ```
 
 O explícitamente:
 
 ```bash
-./pymini --run programa.pymini
+bin/pymini --run programa.pymini
 ```
 
 Esto compila el programa y lo ejecuta inmediatamente, mostrando la salida.
@@ -316,7 +316,7 @@ Esto compila el programa y lo ejecuta inmediatamente, mostrando la salida.
 ### Modo 2: Solo generar código C
 
 ```bash
-./pymini --emit-c -o programa.c programa.pymini
+bin/pymini --emit-c -o programa.c programa.pymini
 ```
 
 Genera código C en `programa.c` sin compilarlo a binario.
@@ -324,7 +324,7 @@ Genera código C en `programa.c` sin compilarlo a binario.
 ### Modo 3: Compilar a ejecutable
 
 ```bash
-./pymini --compile -o programa programa.pymini
+bin/pymini --compile -o programa programa.pymini
 ```
 
 Genera un ejecutable nativo llamado `programa`.
@@ -332,8 +332,8 @@ Genera un ejecutable nativo llamado `programa`.
 ### Opciones de optimización
 
 ```bash
-./pymini -O0 programa.pymini    # Sin optimizaciones (por defecto)
-./pymini -O1 programa.pymini    # Optimizaciones básicas
+bin/pymini -O0 programa.pymini    # Sin optimizaciones (por defecto)
+bin/pymini -O1 programa.pymini    # Optimizaciones básicas
 ```
 
 Las optimizaciones `-O1` incluyen:
@@ -343,23 +343,23 @@ Las optimizaciones `-O1` incluyen:
 ### Opciones adicionales
 
 ```bash
-./pymini --help              # Muestra ayuda
-./pymini --version           # Muestra versión
-./pymini -v programa.pymini  # Modo verbose (muestra pasos del pipeline)
+bin/pymini --help              # Muestra ayuda
+bin/pymini --version           # Muestra versión
+bin/pymini -v programa.pymini  # Modo verbose (muestra pasos del pipeline)
 ```
 
 ### Ejemplos completos
 
 ```bash
 # Compilar y ejecutar con optimizaciones
-./pymini -O1 tests/e2e/pos/e02_arith.pymini
+bin/pymini -O1 tests/e2e/pos/e02_arith.pymini
 
 # Generar código C y ver el resultado
-./pymini --emit-c -o temp.c tests/e2e/pos/e04_funcs.pymini
+bin/pymini --emit-c -o temp.c tests/e2e/pos/e04_funcs.pymini
 cat temp.c
 
 # Compilar a ejecutable y ejecutarlo manualmente
-./pymini --compile -o mi_programa tests/e2e/pos/e03_if_while.pymini
+bin/pymini --compile -o mi_programa tests/e2e/pos/e03_if_while.pymini
 ./mi_programa
 ```
 
@@ -554,7 +554,7 @@ suma = x + y
 print(suma)
 
 # Uso:
-# $ echo -e "5\n3" | ./pymini programa.pymini
+# $ echo -e "5\n3" | bin/pymini programa.pymini
 # 8
 ```
 
@@ -574,7 +574,7 @@ resultado = factorial(n)
 print(resultado)
 
 # Uso:
-# $ echo "5" | ./pymini factorial.pymini
+# $ echo "5" | bin/pymini factorial.pymini
 # 120
 ```
 
@@ -675,10 +675,10 @@ bash tests/run.sh && make test-e2e
 
 ```bash
 # Test semántico
-./pymini tests/pos/p01_simple.pymini
+bin/pymini tests/pos/p01_simple.pymini
 
 # Test e2e (compila y ejecuta)
-./pymini --run tests/e2e/pos/e02_arith.pymini
+bin/pymini --run tests/e2e/pos/e02_arith.pymini
 
 # Usando el helper script
 ./tools/build_and_run.sh tests/e2e/pos/e01_hello.pymini
@@ -695,6 +695,8 @@ Si todas las pruebas pasan, verás mensajes de éxito para cada una.
 ```
 Compilador_Python/
 ├── src/              # Código fuente del compilador (C, Flex, Bison)
+├── build/            # Archivos de compilación (*.o, *.c generados)
+├── bin/              # Ejecutable del compilador (pymini)
 ├── tests/            # Suite de tests automatizados
 │   ├── pos/          # Tests positivos (semántica correcta)
 │   ├── neg/          # Tests negativos (errores esperados)
@@ -712,6 +714,8 @@ Compilador_Python/
 ### Carpetas Principales
 
 - **`src/`**: Código fuente en C, lexer y parser
+- **`build/`**: Archivos temporales de compilación (*.o, lex.yy.c, parser.tab.*)
+- **`bin/`**: Ejecutable compilado (`pymini`)
 - **`tests/`**: Tests organizados (pos/neg/e2e/manual)
 - **`demos/`**: Programas para demostraciones (`demo.pymini`, etc.)
 - **`examples/`**: Ejemplos interactivos con `input()`
@@ -734,7 +738,7 @@ Compilador_Python/
 make clean && make
 
 # Ejecutar demo
-./pymini demos/demo.pymini
+bin/pymini demos/demo.pymini
 
 # Ejecutar tests
 bash scripts/run_tests.sh
@@ -757,12 +761,12 @@ solución: instalar las herramientas indicadas más arriba.
 
 solución: verificar que la ruta es correcta y que se está en el directorio del proyecto.
 
-3) segmentation fault al ejecutar `./pymini` después de compilar
+3) segmentation fault al ejecutar `bin/pymini` después de compilar
 
 solución:
 
 - recompilar desde cero: `make clean && make`
-- si persiste, usar gdb: `sudo apt install -y gdb` y luego `gdb ./pymini` para obtener backtrace
+- si persiste, usar gdb: `sudo apt install -y gdb` y luego `gdb bin/pymini` para obtener backtrace
 
 4) advertencia "1 shift/reduce conflict"
 

@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "src/ast.h"
+#include "ast.h"
 
 /* Declaraciones externas */
 extern int real_yylex(void);  /* Wrapper personalizado */

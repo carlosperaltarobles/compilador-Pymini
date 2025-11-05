@@ -10,7 +10,7 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR/.." || exit 1
 
-COMPILER="./pymini"
+COMPILER="../bin/pymini"
 POS_DIR="tests/pos"
 NEG_DIR="tests/neg"
 

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "src/ast.h"
+#include "ast.h"
 #include "parser.tab.h"
 
 /* Declarar strdup si no está disponible */

@@ -12,8 +12,8 @@ echo "=========================================="
 echo ""
 
 # Verificar que pymini existe
-if [ ! -f ./pymini ]; then
-    echo "❌ ERROR: El ejecutable './pymini' no existe."
+if [ ! -f ./bin/pymini ]; then
+    echo "❌ ERROR: El ejecutable './bin/pymini' no existe."
     echo "Por favor ejecuta primero: make clean && make"
     exit 1
 fi
@@ -37,7 +37,7 @@ cat demos/demo.pymini
 pause
 
 echo "Compilando demos/demo.pymini..."
-./pymini demos/demo.pymini
+./bin/pymini demos/demo.pymini
 pause
 
 echo "=== PASO 3: Error Semántico (Variable no declarada) ==="
@@ -46,7 +46,7 @@ cat demos/demo_error.pymini
 pause
 
 echo "Compilando demos/demo_error.pymini (debe fallar)..."
-./pymini demos/demo_error.pymini
+./bin/pymini demos/demo_error.pymini
 echo ""
 echo "✓ El compilador detectó correctamente el error"
 pause
@@ -57,7 +57,7 @@ cat demos/demo_tipos.pymini
 pause
 
 echo "Compilando demos/demo_tipos.pymini (debe fallar)..."
-./pymini demos/demo_tipos.pymini
+./bin/pymini demos/demo_tipos.pymini
 echo ""
 echo "✓ El compilador detectó correctamente la incompatibilidad de tipos"
 pause
