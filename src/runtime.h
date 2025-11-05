@@ -15,6 +15,12 @@ void rt_print_int(int x);
 void rt_print_bool(int b);
 
 /**
+ * Lee un entero desde la entrada estándar
+ * Retorna el entero leído
+ */
+int rt_input_int(void);
+
+/**
  * División entera con verificación de división entre cero
  * Termina el programa con error formateado si b == 0
  */

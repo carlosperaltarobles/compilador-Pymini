@@ -61,32 +61,33 @@ extern int yydebug;
     KW_DEF = 262,                  /* KW_DEF  */
     KW_RETURN = 263,               /* KW_RETURN  */
     KW_PRINT = 264,                /* KW_PRINT  */
-    TOK_AND = 265,                 /* TOK_AND  */
-    TOK_OR = 266,                  /* TOK_OR  */
-    TOK_NOT = 267,                 /* TOK_NOT  */
-    TOK_EQ = 268,                  /* TOK_EQ  */
-    TOK_NE = 269,                  /* TOK_NE  */
-    TOK_LT = 270,                  /* TOK_LT  */
-    TOK_LE = 271,                  /* TOK_LE  */
-    TOK_GT = 272,                  /* TOK_GT  */
-    TOK_GE = 273,                  /* TOK_GE  */
-    TOK_PLUS = 274,                /* TOK_PLUS  */
-    TOK_MINUS = 275,               /* TOK_MINUS  */
-    TOK_STAR = 276,                /* TOK_STAR  */
-    TOK_SLASH = 277,               /* TOK_SLASH  */
-    TOK_MOD = 278,                 /* TOK_MOD  */
-    ASSIGN = 279,                  /* ASSIGN  */
-    LPAREN = 280,                  /* LPAREN  */
-    RPAREN = 281,                  /* RPAREN  */
-    COLON = 282,                   /* COLON  */
-    COMMA = 283,                   /* COMMA  */
-    INDENT = 284,                  /* INDENT  */
-    DEDENT = 285,                  /* DEDENT  */
-    NEWLINE = 286,                 /* NEWLINE  */
-    INT_LIT = 287,                 /* INT_LIT  */
-    BOOL_LIT = 288,                /* BOOL_LIT  */
-    IDENT = 289,                   /* IDENT  */
-    UNARY = 290                    /* UNARY  */
+    KW_INPUT = 265,                /* KW_INPUT  */
+    TOK_AND = 266,                 /* TOK_AND  */
+    TOK_OR = 267,                  /* TOK_OR  */
+    TOK_NOT = 268,                 /* TOK_NOT  */
+    TOK_EQ = 269,                  /* TOK_EQ  */
+    TOK_NE = 270,                  /* TOK_NE  */
+    TOK_LT = 271,                  /* TOK_LT  */
+    TOK_LE = 272,                  /* TOK_LE  */
+    TOK_GT = 273,                  /* TOK_GT  */
+    TOK_GE = 274,                  /* TOK_GE  */
+    TOK_PLUS = 275,                /* TOK_PLUS  */
+    TOK_MINUS = 276,               /* TOK_MINUS  */
+    TOK_STAR = 277,                /* TOK_STAR  */
+    TOK_SLASH = 278,               /* TOK_SLASH  */
+    TOK_MOD = 279,                 /* TOK_MOD  */
+    ASSIGN = 280,                  /* ASSIGN  */
+    LPAREN = 281,                  /* LPAREN  */
+    RPAREN = 282,                  /* RPAREN  */
+    COLON = 283,                   /* COLON  */
+    COMMA = 284,                   /* COMMA  */
+    INDENT = 285,                  /* INDENT  */
+    DEDENT = 286,                  /* DEDENT  */
+    NEWLINE = 287,                 /* NEWLINE  */
+    INT_LIT = 288,                 /* INT_LIT  */
+    BOOL_LIT = 289,                /* BOOL_LIT  */
+    IDENT = 290,                   /* IDENT  */
+    UNARY = 291                    /* UNARY  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -103,7 +104,7 @@ union YYSTYPE
     Ast* ast_node;
     OpKind op_kind;
 
-#line 107 "parser.tab.h"
+#line 108 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

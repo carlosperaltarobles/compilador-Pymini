@@ -239,6 +239,11 @@ static Type sema_visit_expr(SemaCtx* ctx, Ast* node) {
             return TY_INT;
         }
         
+        case AST_INPUT:
+            // input() siempre retorna int
+            node->type = TY_INT;
+            return TY_INT;
+        
         default:
             diag_error(node->loc.line, node->loc.column,
                 "nodo inesperado en expresión");

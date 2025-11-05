@@ -51,7 +51,7 @@ Location make_location(int line, int col) {
 /* ========== Tokens ========== */
 
 /* Palabras clave */
-%token KW_IF KW_ELIF KW_ELSE KW_WHILE KW_DEF KW_RETURN KW_PRINT
+%token KW_IF KW_ELIF KW_ELSE KW_WHILE KW_DEF KW_RETURN KW_PRINT KW_INPUT
 
 /* Operadores lógicos */
 %token TOK_AND TOK_OR TOK_NOT
@@ -82,7 +82,7 @@ Location make_location(int line, int col) {
 %type <ast_node> while_stmt func_def block
 %type <ast_node> expr or_expr and_expr not_expr
 %type <ast_node> comparison_expr add_expr mult_expr unary_expr primary_expr
-%type <ast_node> call_expr
+%type <ast_node> call_expr input_expr
 %type <ast_node> opt_params param_list
 %type <ast_node> opt_args arg_list
 
@@ -347,6 +347,8 @@ primary_expr:
         }
     | call_expr
         { $$ = $1; }
+    | input_expr
+        { $$ = $1; }
     | LPAREN expr RPAREN
         { $$ = $2; }
     ;
@@ -358,6 +360,12 @@ call_expr:
             $$ = ast_new_call($1, $3, LOC);
             free($1);
         }
+    ;
+
+/* Función input() */
+input_expr:
+    KW_INPUT LPAREN RPAREN
+        { $$ = ast_new_input(LOC); }
     ;
 
 /* ========== Argumentos de Función ========== */

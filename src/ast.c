@@ -180,6 +180,11 @@ Ast* ast_new_call(char* name, Ast* args, Location loc) {
     return node;
 }
 
+Ast* ast_new_input(Location loc) {
+    Ast* node = ast_alloc(AST_INPUT, loc);
+    return node;
+}
+
 Ast* ast_new_name(char* id, Location loc) {
     Ast* node = ast_alloc(AST_NAME, loc);
     node->data.name.id = str_dup(id);
@@ -271,6 +276,7 @@ const char* ast_kind_to_string(AstKind kind) {
         case AST_BIN_OP: return "BinOp";
         case AST_UN_OP: return "UnOp";
         case AST_CALL: return "Call";
+        case AST_INPUT: return "Input";
         case AST_NAME: return "Name";
         case AST_INT_LIT: return "IntLit";
         case AST_BOOL_LIT: return "BoolLit";

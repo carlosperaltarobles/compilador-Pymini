@@ -168,6 +168,10 @@ static void codegen_expr(CodegenCtx* ctx, Ast* node) {
         case AST_CALL:
             codegen_call(ctx, node);
             break;
+        
+        case AST_INPUT:
+            emit_raw(ctx, "rt_input_int()");
+            break;
             
         default:
             fprintf(stderr, "Codegen Error: Unexpected expression kind %d\n", node->kind);

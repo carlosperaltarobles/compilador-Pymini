@@ -162,6 +162,10 @@ void ast_print_indent(const Ast* node, int indent) {
                 printf("(no arguments)\n");
             }
             break;
+        
+        case AST_INPUT:
+            printf("Input [%d:%d]\n", node->loc.line, node->loc.column);
+            break;
             
         case AST_NAME:
             printf("Name [%d:%d] id='%s'\n", 

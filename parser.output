@@ -83,15 +83,18 @@ Grammar
    54             | BOOL_LIT
    55             | IDENT
    56             | call_expr
-   57             | LPAREN expr RPAREN
+   57             | input_expr
+   58             | LPAREN expr RPAREN
 
-   58 call_expr: IDENT LPAREN opt_args RPAREN
+   59 call_expr: IDENT LPAREN opt_args RPAREN
 
-   59 opt_args: ε
-   60         | arg_list
+   60 input_expr: KW_INPUT LPAREN RPAREN
 
-   61 arg_list: expr
-   62         | arg_list COMMA expr
+   61 opt_args: ε
+   62         | arg_list
+
+   63 arg_list: expr
+   64         | arg_list COMMA expr
 
 
 Terminals, with rules where they appear
@@ -105,125 +108,129 @@ Terminals, with rules where they appear
     KW_DEF (262) 24
     KW_RETURN (263) 12 13
     KW_PRINT (264) 11
-    TOK_AND (265) 34
-    TOK_OR (266) 32
-    TOK_NOT (267) 36
-    TOK_EQ (268) 38
-    TOK_NE (269) 39
-    TOK_LT (270) 40
-    TOK_LE (271) 41
-    TOK_GT (272) 42
-    TOK_GE (273) 43
-    TOK_PLUS (274) 45
-    TOK_MINUS (275) 46 52
-    TOK_STAR (276) 48
-    TOK_SLASH (277) 49
-    TOK_MOD (278) 50
-    ASSIGN (279) 10
-    LPAREN (280) 11 24 57 58
-    RPAREN (281) 11 24 57 58
-    COLON (282) 17 20 22 23 24
-    COMMA (283) 29 62
-    INDENT (284) 25
-    DEDENT (285) 25
-    NEWLINE (286) 4 6 17 20 22 23 24
-    INT_LIT <int_val> (287) 53
-    BOOL_LIT <bool_val> (288) 54
-    IDENT <str_val> (289) 10 24 28 29 55 58
-    UNARY (290)
+    KW_INPUT (265) 60
+    TOK_AND (266) 34
+    TOK_OR (267) 32
+    TOK_NOT (268) 36
+    TOK_EQ (269) 38
+    TOK_NE (270) 39
+    TOK_LT (271) 40
+    TOK_LE (272) 41
+    TOK_GT (273) 42
+    TOK_GE (274) 43
+    TOK_PLUS (275) 45
+    TOK_MINUS (276) 46 52
+    TOK_STAR (277) 48
+    TOK_SLASH (278) 49
+    TOK_MOD (279) 50
+    ASSIGN (280) 10
+    LPAREN (281) 11 24 58 59 60
+    RPAREN (282) 11 24 58 59 60
+    COLON (283) 17 20 22 23 24
+    COMMA (284) 29 64
+    INDENT (285) 25
+    DEDENT (286) 25
+    NEWLINE (287) 4 6 17 20 22 23 24
+    INT_LIT <int_val> (288) 53
+    BOOL_LIT <bool_val> (289) 54
+    IDENT <str_val> (290) 10 24 28 29 55 59
+    UNARY (291)
 
 
 Nonterminals, with rules where they appear
 
-    $accept (36)
+    $accept (37)
         on left: 0
-    program <ast_node> (37)
+    program <ast_node> (38)
         on left: 1
         on right: 0
-    stmt_list <ast_node> (38)
+    stmt_list <ast_node> (39)
         on left: 2 3
         on right: 1 3 25
-    stmt <ast_node> (39)
+    stmt <ast_node> (40)
         on left: 4 5 6
         on right: 3
-    simple_stmt <ast_node> (40)
+    simple_stmt <ast_node> (41)
         on left: 7 8 9
         on right: 4
-    assign_stmt <ast_node> (41)
+    assign_stmt <ast_node> (42)
         on left: 10
         on right: 7
-    print_stmt <ast_node> (42)
+    print_stmt <ast_node> (43)
         on left: 11
         on right: 8
-    return_stmt <ast_node> (43)
+    return_stmt <ast_node> (44)
         on left: 12 13
         on right: 9
-    compound_stmt <ast_node> (44)
+    compound_stmt <ast_node> (45)
         on left: 14 15 16
         on right: 5
-    if_stmt <ast_node> (45)
+    if_stmt <ast_node> (46)
         on left: 17
         on right: 14
-    elif_list <ast_node> (46)
+    elif_list <ast_node> (47)
         on left: 18 19
         on right: 17 19
-    elif_clause <ast_node> (47)
+    elif_clause <ast_node> (48)
         on left: 20
         on right: 19
-    opt_else <ast_node> (48)
+    opt_else <ast_node> (49)
         on left: 21 22
         on right: 17
-    while_stmt <ast_node> (49)
+    while_stmt <ast_node> (50)
         on left: 23
         on right: 15
-    func_def <ast_node> (50)
+    func_def <ast_node> (51)
         on left: 24
         on right: 16
-    block <ast_node> (51)
+    block <ast_node> (52)
         on left: 25
         on right: 17 20 22 23 24
-    opt_params <ast_node> (52)
+    opt_params <ast_node> (53)
         on left: 26 27
         on right: 24
-    param_list <ast_node> (53)
+    param_list <ast_node> (54)
         on left: 28 29
         on right: 27 29
-    expr <ast_node> (54)
+    expr <ast_node> (55)
         on left: 30
-        on right: 10 11 12 17 20 23 57 61 62
-    or_expr <ast_node> (55)
+        on right: 10 11 12 17 20 23 58 63 64
+    or_expr <ast_node> (56)
         on left: 31 32
         on right: 30 32
-    and_expr <ast_node> (56)
+    and_expr <ast_node> (57)
         on left: 33 34
         on right: 31 32 34
-    not_expr <ast_node> (57)
+    not_expr <ast_node> (58)
         on left: 35 36
         on right: 33 34 36
-    comparison_expr <ast_node> (58)
+    comparison_expr <ast_node> (59)
         on left: 37 38 39 40 41 42 43
         on right: 35 38 39 40 41 42 43
-    add_expr <ast_node> (59)
+    add_expr <ast_node> (60)
         on left: 44 45 46
         on right: 37 38 39 40 41 42 43 45 46
-    mult_expr <ast_node> (60)
+    mult_expr <ast_node> (61)
         on left: 47 48 49 50
         on right: 44 45 46 48 49 50
-    unary_expr <ast_node> (61)
+    unary_expr <ast_node> (62)
         on left: 51 52
         on right: 47 48 49 50 52
-    primary_expr <ast_node> (62)
-        on left: 53 54 55 56 57
+    primary_expr <ast_node> (63)
+        on left: 53 54 55 56 57 58
         on right: 51
-    call_expr <ast_node> (63)
-        on left: 58
+    call_expr <ast_node> (64)
+        on left: 59
         on right: 56
-    opt_args <ast_node> (64)
-        on left: 59 60
-        on right: 58
-    arg_list <ast_node> (65)
+    input_expr <ast_node> (65)
+        on left: 60
+        on right: 57
+    opt_args <ast_node> (66)
         on left: 61 62
-        on right: 60 62
+        on right: 59
+    arg_list <ast_node> (67)
+        on left: 63 64
+        on right: 62 64
 
 
 State 0
@@ -280,53 +287,57 @@ State 4
 
    17 if_stmt: KW_IF • expr COLON NEWLINE block elif_list opt_else
 
-    TOK_NOT    shift, and go to state 20
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_NOT    shift, and go to state 21
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    expr             go to state 26
-    or_expr          go to state 27
-    and_expr         go to state 28
-    not_expr         go to state 29
-    comparison_expr  go to state 30
-    add_expr         go to state 31
-    mult_expr        go to state 32
-    unary_expr       go to state 33
-    primary_expr     go to state 34
-    call_expr        go to state 35
+    expr             go to state 27
+    or_expr          go to state 28
+    and_expr         go to state 29
+    not_expr         go to state 30
+    comparison_expr  go to state 31
+    add_expr         go to state 32
+    mult_expr        go to state 33
+    unary_expr       go to state 34
+    primary_expr     go to state 35
+    call_expr        go to state 36
+    input_expr       go to state 37
 
 
 State 5
 
    23 while_stmt: KW_WHILE • expr COLON NEWLINE block
 
-    TOK_NOT    shift, and go to state 20
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_NOT    shift, and go to state 21
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    expr             go to state 36
-    or_expr          go to state 27
-    and_expr         go to state 28
-    not_expr         go to state 29
-    comparison_expr  go to state 30
-    add_expr         go to state 31
-    mult_expr        go to state 32
-    unary_expr       go to state 33
-    primary_expr     go to state 34
-    call_expr        go to state 35
+    expr             go to state 38
+    or_expr          go to state 28
+    and_expr         go to state 29
+    not_expr         go to state 30
+    comparison_expr  go to state 31
+    add_expr         go to state 32
+    mult_expr        go to state 33
+    unary_expr       go to state 34
+    primary_expr     go to state 35
+    call_expr        go to state 36
+    input_expr       go to state 37
 
 
 State 6
 
    24 func_def: KW_DEF • IDENT LPAREN opt_params RPAREN COLON NEWLINE block
 
-    IDENT  shift, and go to state 37
+    IDENT  shift, and go to state 39
 
 
 State 7
@@ -334,32 +345,34 @@ State 7
    12 return_stmt: KW_RETURN • expr
    13            | KW_RETURN •
 
-    TOK_NOT    shift, and go to state 20
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_NOT    shift, and go to state 21
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
     $default  reduce using rule 13 (return_stmt)
 
-    expr             go to state 38
-    or_expr          go to state 27
-    and_expr         go to state 28
-    not_expr         go to state 29
-    comparison_expr  go to state 30
-    add_expr         go to state 31
-    mult_expr        go to state 32
-    unary_expr       go to state 33
-    primary_expr     go to state 34
-    call_expr        go to state 35
+    expr             go to state 40
+    or_expr          go to state 28
+    and_expr         go to state 29
+    not_expr         go to state 30
+    comparison_expr  go to state 31
+    add_expr         go to state 32
+    mult_expr        go to state 33
+    unary_expr       go to state 34
+    primary_expr     go to state 35
+    call_expr        go to state 36
+    input_expr       go to state 37
 
 
 State 8
 
    11 print_stmt: KW_PRINT • LPAREN expr RPAREN
 
-    LPAREN  shift, and go to state 39
+    LPAREN  shift, and go to state 41
 
 
 State 9
@@ -373,7 +386,7 @@ State 10
 
    10 assign_stmt: IDENT • ASSIGN expr
 
-    ASSIGN  shift, and go to state 40
+    ASSIGN  shift, and go to state 42
 
 
 State 11
@@ -387,7 +400,7 @@ State 12
 
     4 stmt: simple_stmt • NEWLINE
 
-    NEWLINE  shift, and go to state 41
+    NEWLINE  shift, and go to state 43
 
 
 State 13
@@ -441,121 +454,134 @@ State 19
 
 State 20
 
-   36 not_expr: TOK_NOT • not_expr
+   60 input_expr: KW_INPUT • LPAREN RPAREN
 
-    TOK_NOT    shift, and go to state 20
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
-
-    not_expr         go to state 42
-    comparison_expr  go to state 30
-    add_expr         go to state 31
-    mult_expr        go to state 32
-    unary_expr       go to state 33
-    primary_expr     go to state 34
-    call_expr        go to state 35
+    LPAREN  shift, and go to state 44
 
 
 State 21
 
-   52 unary_expr: TOK_MINUS • unary_expr
+   36 not_expr: TOK_NOT • not_expr
 
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_NOT    shift, and go to state 21
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    unary_expr    go to state 43
-    primary_expr  go to state 34
-    call_expr     go to state 35
+    not_expr         go to state 45
+    comparison_expr  go to state 31
+    add_expr         go to state 32
+    mult_expr        go to state 33
+    unary_expr       go to state 34
+    primary_expr     go to state 35
+    call_expr        go to state 36
+    input_expr       go to state 37
 
 
 State 22
 
-   57 primary_expr: LPAREN • expr RPAREN
+   52 unary_expr: TOK_MINUS • unary_expr
 
-    TOK_NOT    shift, and go to state 20
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    expr             go to state 44
-    or_expr          go to state 27
-    and_expr         go to state 28
-    not_expr         go to state 29
-    comparison_expr  go to state 30
-    add_expr         go to state 31
-    mult_expr        go to state 32
-    unary_expr       go to state 33
-    primary_expr     go to state 34
-    call_expr        go to state 35
+    unary_expr    go to state 46
+    primary_expr  go to state 35
+    call_expr     go to state 36
+    input_expr    go to state 37
 
 
 State 23
+
+   58 primary_expr: LPAREN • expr RPAREN
+
+    KW_INPUT   shift, and go to state 20
+    TOK_NOT    shift, and go to state 21
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
+
+    expr             go to state 47
+    or_expr          go to state 28
+    and_expr         go to state 29
+    not_expr         go to state 30
+    comparison_expr  go to state 31
+    add_expr         go to state 32
+    mult_expr        go to state 33
+    unary_expr       go to state 34
+    primary_expr     go to state 35
+    call_expr        go to state 36
+    input_expr       go to state 37
+
+
+State 24
 
    53 primary_expr: INT_LIT •
 
     $default  reduce using rule 53 (primary_expr)
 
 
-State 24
+State 25
 
    54 primary_expr: BOOL_LIT •
 
     $default  reduce using rule 54 (primary_expr)
 
 
-State 25
+State 26
 
    55 primary_expr: IDENT •
-   58 call_expr: IDENT • LPAREN opt_args RPAREN
+   59 call_expr: IDENT • LPAREN opt_args RPAREN
 
-    LPAREN  shift, and go to state 45
+    LPAREN  shift, and go to state 48
 
     $default  reduce using rule 55 (primary_expr)
 
 
-State 26
+State 27
 
    17 if_stmt: KW_IF expr • COLON NEWLINE block elif_list opt_else
 
-    COLON  shift, and go to state 46
-
-
-State 27
-
-   30 expr: or_expr •
-   32 or_expr: or_expr • TOK_OR and_expr
-
-    TOK_OR  shift, and go to state 47
-
-    $default  reduce using rule 30 (expr)
+    COLON  shift, and go to state 49
 
 
 State 28
 
+   30 expr: or_expr •
+   32 or_expr: or_expr • TOK_OR and_expr
+
+    TOK_OR  shift, and go to state 50
+
+    $default  reduce using rule 30 (expr)
+
+
+State 29
+
    31 or_expr: and_expr •
    34 and_expr: and_expr • TOK_AND not_expr
 
-    TOK_AND  shift, and go to state 48
+    TOK_AND  shift, and go to state 51
 
     $default  reduce using rule 31 (or_expr)
 
 
-State 29
+State 30
 
    33 and_expr: not_expr •
 
     $default  reduce using rule 33 (and_expr)
 
 
-State 30
+State 31
 
    35 not_expr: comparison_expr •
    38 comparison_expr: comparison_expr • TOK_EQ add_expr
@@ -565,740 +591,795 @@ State 30
    42                | comparison_expr • TOK_GT add_expr
    43                | comparison_expr • TOK_GE add_expr
 
-    TOK_EQ  shift, and go to state 49
-    TOK_NE  shift, and go to state 50
-    TOK_LT  shift, and go to state 51
-    TOK_LE  shift, and go to state 52
-    TOK_GT  shift, and go to state 53
-    TOK_GE  shift, and go to state 54
+    TOK_EQ  shift, and go to state 52
+    TOK_NE  shift, and go to state 53
+    TOK_LT  shift, and go to state 54
+    TOK_LE  shift, and go to state 55
+    TOK_GT  shift, and go to state 56
+    TOK_GE  shift, and go to state 57
 
     $default  reduce using rule 35 (not_expr)
 
 
-State 31
+State 32
 
    37 comparison_expr: add_expr •
    45 add_expr: add_expr • TOK_PLUS mult_expr
    46         | add_expr • TOK_MINUS mult_expr
 
-    TOK_PLUS   shift, and go to state 55
-    TOK_MINUS  shift, and go to state 56
+    TOK_PLUS   shift, and go to state 58
+    TOK_MINUS  shift, and go to state 59
 
     $default  reduce using rule 37 (comparison_expr)
 
 
-State 32
+State 33
 
    44 add_expr: mult_expr •
    48 mult_expr: mult_expr • TOK_STAR unary_expr
    49          | mult_expr • TOK_SLASH unary_expr
    50          | mult_expr • TOK_MOD unary_expr
 
-    TOK_STAR   shift, and go to state 57
-    TOK_SLASH  shift, and go to state 58
-    TOK_MOD    shift, and go to state 59
+    TOK_STAR   shift, and go to state 60
+    TOK_SLASH  shift, and go to state 61
+    TOK_MOD    shift, and go to state 62
 
     $default  reduce using rule 44 (add_expr)
 
 
-State 33
+State 34
 
    47 mult_expr: unary_expr •
 
     $default  reduce using rule 47 (mult_expr)
 
 
-State 34
+State 35
 
    51 unary_expr: primary_expr •
 
     $default  reduce using rule 51 (unary_expr)
 
 
-State 35
+State 36
 
    56 primary_expr: call_expr •
 
     $default  reduce using rule 56 (primary_expr)
 
 
-State 36
-
-   23 while_stmt: KW_WHILE expr • COLON NEWLINE block
-
-    COLON  shift, and go to state 60
-
-
 State 37
 
-   24 func_def: KW_DEF IDENT • LPAREN opt_params RPAREN COLON NEWLINE block
+   57 primary_expr: input_expr •
 
-    LPAREN  shift, and go to state 61
+    $default  reduce using rule 57 (primary_expr)
 
 
 State 38
+
+   23 while_stmt: KW_WHILE expr • COLON NEWLINE block
+
+    COLON  shift, and go to state 63
+
+
+State 39
+
+   24 func_def: KW_DEF IDENT • LPAREN opt_params RPAREN COLON NEWLINE block
+
+    LPAREN  shift, and go to state 64
+
+
+State 40
 
    12 return_stmt: KW_RETURN expr •
 
     $default  reduce using rule 12 (return_stmt)
 
 
-State 39
+State 41
 
    11 print_stmt: KW_PRINT LPAREN • expr RPAREN
 
-    TOK_NOT    shift, and go to state 20
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_NOT    shift, and go to state 21
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    expr             go to state 62
-    or_expr          go to state 27
-    and_expr         go to state 28
-    not_expr         go to state 29
-    comparison_expr  go to state 30
-    add_expr         go to state 31
-    mult_expr        go to state 32
-    unary_expr       go to state 33
-    primary_expr     go to state 34
-    call_expr        go to state 35
+    expr             go to state 65
+    or_expr          go to state 28
+    and_expr         go to state 29
+    not_expr         go to state 30
+    comparison_expr  go to state 31
+    add_expr         go to state 32
+    mult_expr        go to state 33
+    unary_expr       go to state 34
+    primary_expr     go to state 35
+    call_expr        go to state 36
+    input_expr       go to state 37
 
 
-State 40
+State 42
 
    10 assign_stmt: IDENT ASSIGN • expr
 
-    TOK_NOT    shift, and go to state 20
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_NOT    shift, and go to state 21
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    expr             go to state 63
-    or_expr          go to state 27
-    and_expr         go to state 28
-    not_expr         go to state 29
-    comparison_expr  go to state 30
-    add_expr         go to state 31
-    mult_expr        go to state 32
-    unary_expr       go to state 33
-    primary_expr     go to state 34
-    call_expr        go to state 35
+    expr             go to state 66
+    or_expr          go to state 28
+    and_expr         go to state 29
+    not_expr         go to state 30
+    comparison_expr  go to state 31
+    add_expr         go to state 32
+    mult_expr        go to state 33
+    unary_expr       go to state 34
+    primary_expr     go to state 35
+    call_expr        go to state 36
+    input_expr       go to state 37
 
 
-State 41
+State 43
 
     4 stmt: simple_stmt NEWLINE •
 
     $default  reduce using rule 4 (stmt)
 
 
-State 42
+State 44
+
+   60 input_expr: KW_INPUT LPAREN • RPAREN
+
+    RPAREN  shift, and go to state 67
+
+
+State 45
 
    36 not_expr: TOK_NOT not_expr •
 
     $default  reduce using rule 36 (not_expr)
 
 
-State 43
+State 46
 
    52 unary_expr: TOK_MINUS unary_expr •
 
     $default  reduce using rule 52 (unary_expr)
 
 
-State 44
-
-   57 primary_expr: LPAREN expr • RPAREN
-
-    RPAREN  shift, and go to state 64
-
-
-State 45
-
-   58 call_expr: IDENT LPAREN • opt_args RPAREN
-
-    TOK_NOT    shift, and go to state 20
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
-
-    $default  reduce using rule 59 (opt_args)
-
-    expr             go to state 65
-    or_expr          go to state 27
-    and_expr         go to state 28
-    not_expr         go to state 29
-    comparison_expr  go to state 30
-    add_expr         go to state 31
-    mult_expr        go to state 32
-    unary_expr       go to state 33
-    primary_expr     go to state 34
-    call_expr        go to state 35
-    opt_args         go to state 66
-    arg_list         go to state 67
-
-
-State 46
-
-   17 if_stmt: KW_IF expr COLON • NEWLINE block elif_list opt_else
-
-    NEWLINE  shift, and go to state 68
-
-
 State 47
 
-   32 or_expr: or_expr TOK_OR • and_expr
+   58 primary_expr: LPAREN expr • RPAREN
 
-    TOK_NOT    shift, and go to state 20
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
-
-    and_expr         go to state 69
-    not_expr         go to state 29
-    comparison_expr  go to state 30
-    add_expr         go to state 31
-    mult_expr        go to state 32
-    unary_expr       go to state 33
-    primary_expr     go to state 34
-    call_expr        go to state 35
+    RPAREN  shift, and go to state 68
 
 
 State 48
 
-   34 and_expr: and_expr TOK_AND • not_expr
+   59 call_expr: IDENT LPAREN • opt_args RPAREN
 
-    TOK_NOT    shift, and go to state 20
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_NOT    shift, and go to state 21
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    not_expr         go to state 70
-    comparison_expr  go to state 30
-    add_expr         go to state 31
-    mult_expr        go to state 32
-    unary_expr       go to state 33
-    primary_expr     go to state 34
-    call_expr        go to state 35
+    $default  reduce using rule 61 (opt_args)
+
+    expr             go to state 69
+    or_expr          go to state 28
+    and_expr         go to state 29
+    not_expr         go to state 30
+    comparison_expr  go to state 31
+    add_expr         go to state 32
+    mult_expr        go to state 33
+    unary_expr       go to state 34
+    primary_expr     go to state 35
+    call_expr        go to state 36
+    input_expr       go to state 37
+    opt_args         go to state 70
+    arg_list         go to state 71
 
 
 State 49
 
-   38 comparison_expr: comparison_expr TOK_EQ • add_expr
+   17 if_stmt: KW_IF expr COLON • NEWLINE block elif_list opt_else
 
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
-
-    add_expr      go to state 71
-    mult_expr     go to state 32
-    unary_expr    go to state 33
-    primary_expr  go to state 34
-    call_expr     go to state 35
+    NEWLINE  shift, and go to state 72
 
 
 State 50
 
-   39 comparison_expr: comparison_expr TOK_NE • add_expr
+   32 or_expr: or_expr TOK_OR • and_expr
 
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_NOT    shift, and go to state 21
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    add_expr      go to state 72
-    mult_expr     go to state 32
-    unary_expr    go to state 33
-    primary_expr  go to state 34
-    call_expr     go to state 35
+    and_expr         go to state 73
+    not_expr         go to state 30
+    comparison_expr  go to state 31
+    add_expr         go to state 32
+    mult_expr        go to state 33
+    unary_expr       go to state 34
+    primary_expr     go to state 35
+    call_expr        go to state 36
+    input_expr       go to state 37
 
 
 State 51
 
-   40 comparison_expr: comparison_expr TOK_LT • add_expr
+   34 and_expr: and_expr TOK_AND • not_expr
 
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_NOT    shift, and go to state 21
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    add_expr      go to state 73
-    mult_expr     go to state 32
-    unary_expr    go to state 33
-    primary_expr  go to state 34
-    call_expr     go to state 35
+    not_expr         go to state 74
+    comparison_expr  go to state 31
+    add_expr         go to state 32
+    mult_expr        go to state 33
+    unary_expr       go to state 34
+    primary_expr     go to state 35
+    call_expr        go to state 36
+    input_expr       go to state 37
 
 
 State 52
 
-   41 comparison_expr: comparison_expr TOK_LE • add_expr
+   38 comparison_expr: comparison_expr TOK_EQ • add_expr
 
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    add_expr      go to state 74
-    mult_expr     go to state 32
-    unary_expr    go to state 33
-    primary_expr  go to state 34
-    call_expr     go to state 35
+    add_expr      go to state 75
+    mult_expr     go to state 33
+    unary_expr    go to state 34
+    primary_expr  go to state 35
+    call_expr     go to state 36
+    input_expr    go to state 37
 
 
 State 53
 
-   42 comparison_expr: comparison_expr TOK_GT • add_expr
+   39 comparison_expr: comparison_expr TOK_NE • add_expr
 
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    add_expr      go to state 75
-    mult_expr     go to state 32
-    unary_expr    go to state 33
-    primary_expr  go to state 34
-    call_expr     go to state 35
+    add_expr      go to state 76
+    mult_expr     go to state 33
+    unary_expr    go to state 34
+    primary_expr  go to state 35
+    call_expr     go to state 36
+    input_expr    go to state 37
 
 
 State 54
 
-   43 comparison_expr: comparison_expr TOK_GE • add_expr
+   40 comparison_expr: comparison_expr TOK_LT • add_expr
 
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    add_expr      go to state 76
-    mult_expr     go to state 32
-    unary_expr    go to state 33
-    primary_expr  go to state 34
-    call_expr     go to state 35
+    add_expr      go to state 77
+    mult_expr     go to state 33
+    unary_expr    go to state 34
+    primary_expr  go to state 35
+    call_expr     go to state 36
+    input_expr    go to state 37
 
 
 State 55
 
-   45 add_expr: add_expr TOK_PLUS • mult_expr
+   41 comparison_expr: comparison_expr TOK_LE • add_expr
 
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    mult_expr     go to state 77
-    unary_expr    go to state 33
-    primary_expr  go to state 34
-    call_expr     go to state 35
+    add_expr      go to state 78
+    mult_expr     go to state 33
+    unary_expr    go to state 34
+    primary_expr  go to state 35
+    call_expr     go to state 36
+    input_expr    go to state 37
 
 
 State 56
 
-   46 add_expr: add_expr TOK_MINUS • mult_expr
+   42 comparison_expr: comparison_expr TOK_GT • add_expr
 
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    mult_expr     go to state 78
-    unary_expr    go to state 33
-    primary_expr  go to state 34
-    call_expr     go to state 35
+    add_expr      go to state 79
+    mult_expr     go to state 33
+    unary_expr    go to state 34
+    primary_expr  go to state 35
+    call_expr     go to state 36
+    input_expr    go to state 37
 
 
 State 57
 
-   48 mult_expr: mult_expr TOK_STAR • unary_expr
+   43 comparison_expr: comparison_expr TOK_GE • add_expr
 
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    unary_expr    go to state 79
-    primary_expr  go to state 34
-    call_expr     go to state 35
+    add_expr      go to state 80
+    mult_expr     go to state 33
+    unary_expr    go to state 34
+    primary_expr  go to state 35
+    call_expr     go to state 36
+    input_expr    go to state 37
 
 
 State 58
 
-   49 mult_expr: mult_expr TOK_SLASH • unary_expr
+   45 add_expr: add_expr TOK_PLUS • mult_expr
 
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    unary_expr    go to state 80
-    primary_expr  go to state 34
-    call_expr     go to state 35
+    mult_expr     go to state 81
+    unary_expr    go to state 34
+    primary_expr  go to state 35
+    call_expr     go to state 36
+    input_expr    go to state 37
 
 
 State 59
 
-   50 mult_expr: mult_expr TOK_MOD • unary_expr
+   46 add_expr: add_expr TOK_MINUS • mult_expr
 
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    unary_expr    go to state 81
-    primary_expr  go to state 34
-    call_expr     go to state 35
+    mult_expr     go to state 82
+    unary_expr    go to state 34
+    primary_expr  go to state 35
+    call_expr     go to state 36
+    input_expr    go to state 37
 
 
 State 60
 
-   23 while_stmt: KW_WHILE expr COLON • NEWLINE block
+   48 mult_expr: mult_expr TOK_STAR • unary_expr
 
-    NEWLINE  shift, and go to state 82
+    KW_INPUT   shift, and go to state 20
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
+
+    unary_expr    go to state 83
+    primary_expr  go to state 35
+    call_expr     go to state 36
+    input_expr    go to state 37
 
 
 State 61
 
-   24 func_def: KW_DEF IDENT LPAREN • opt_params RPAREN COLON NEWLINE block
+   49 mult_expr: mult_expr TOK_SLASH • unary_expr
 
-    IDENT  shift, and go to state 83
+    KW_INPUT   shift, and go to state 20
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    $default  reduce using rule 26 (opt_params)
-
-    opt_params  go to state 84
-    param_list  go to state 85
+    unary_expr    go to state 84
+    primary_expr  go to state 35
+    call_expr     go to state 36
+    input_expr    go to state 37
 
 
 State 62
 
-   11 print_stmt: KW_PRINT LPAREN expr • RPAREN
+   50 mult_expr: mult_expr TOK_MOD • unary_expr
 
-    RPAREN  shift, and go to state 86
+    KW_INPUT   shift, and go to state 20
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
+
+    unary_expr    go to state 85
+    primary_expr  go to state 35
+    call_expr     go to state 36
+    input_expr    go to state 37
 
 
 State 63
+
+   23 while_stmt: KW_WHILE expr COLON • NEWLINE block
+
+    NEWLINE  shift, and go to state 86
+
+
+State 64
+
+   24 func_def: KW_DEF IDENT LPAREN • opt_params RPAREN COLON NEWLINE block
+
+    IDENT  shift, and go to state 87
+
+    $default  reduce using rule 26 (opt_params)
+
+    opt_params  go to state 88
+    param_list  go to state 89
+
+
+State 65
+
+   11 print_stmt: KW_PRINT LPAREN expr • RPAREN
+
+    RPAREN  shift, and go to state 90
+
+
+State 66
 
    10 assign_stmt: IDENT ASSIGN expr •
 
     $default  reduce using rule 10 (assign_stmt)
 
 
-State 64
-
-   57 primary_expr: LPAREN expr RPAREN •
-
-    $default  reduce using rule 57 (primary_expr)
-
-
-State 65
-
-   61 arg_list: expr •
-
-    $default  reduce using rule 61 (arg_list)
-
-
-State 66
-
-   58 call_expr: IDENT LPAREN opt_args • RPAREN
-
-    RPAREN  shift, and go to state 87
-
-
 State 67
 
-   60 opt_args: arg_list •
-   62 arg_list: arg_list • COMMA expr
+   60 input_expr: KW_INPUT LPAREN RPAREN •
 
-    COMMA  shift, and go to state 88
-
-    $default  reduce using rule 60 (opt_args)
+    $default  reduce using rule 60 (input_expr)
 
 
 State 68
 
-   17 if_stmt: KW_IF expr COLON NEWLINE • block elif_list opt_else
+   58 primary_expr: LPAREN expr RPAREN •
 
-    INDENT  shift, and go to state 89
-
-    block  go to state 90
+    $default  reduce using rule 58 (primary_expr)
 
 
 State 69
 
+   63 arg_list: expr •
+
+    $default  reduce using rule 63 (arg_list)
+
+
+State 70
+
+   59 call_expr: IDENT LPAREN opt_args • RPAREN
+
+    RPAREN  shift, and go to state 91
+
+
+State 71
+
+   62 opt_args: arg_list •
+   64 arg_list: arg_list • COMMA expr
+
+    COMMA  shift, and go to state 92
+
+    $default  reduce using rule 62 (opt_args)
+
+
+State 72
+
+   17 if_stmt: KW_IF expr COLON NEWLINE • block elif_list opt_else
+
+    INDENT  shift, and go to state 93
+
+    block  go to state 94
+
+
+State 73
+
    32 or_expr: or_expr TOK_OR and_expr •
    34 and_expr: and_expr • TOK_AND not_expr
 
-    TOK_AND  shift, and go to state 48
+    TOK_AND  shift, and go to state 51
 
     $default  reduce using rule 32 (or_expr)
 
 
-State 70
+State 74
 
    34 and_expr: and_expr TOK_AND not_expr •
 
     $default  reduce using rule 34 (and_expr)
 
 
-State 71
+State 75
 
    38 comparison_expr: comparison_expr TOK_EQ add_expr •
    45 add_expr: add_expr • TOK_PLUS mult_expr
    46         | add_expr • TOK_MINUS mult_expr
 
-    TOK_PLUS   shift, and go to state 55
-    TOK_MINUS  shift, and go to state 56
+    TOK_PLUS   shift, and go to state 58
+    TOK_MINUS  shift, and go to state 59
 
     $default  reduce using rule 38 (comparison_expr)
 
 
-State 72
+State 76
 
    39 comparison_expr: comparison_expr TOK_NE add_expr •
    45 add_expr: add_expr • TOK_PLUS mult_expr
    46         | add_expr • TOK_MINUS mult_expr
 
-    TOK_PLUS   shift, and go to state 55
-    TOK_MINUS  shift, and go to state 56
+    TOK_PLUS   shift, and go to state 58
+    TOK_MINUS  shift, and go to state 59
 
     $default  reduce using rule 39 (comparison_expr)
 
 
-State 73
+State 77
 
    40 comparison_expr: comparison_expr TOK_LT add_expr •
    45 add_expr: add_expr • TOK_PLUS mult_expr
    46         | add_expr • TOK_MINUS mult_expr
 
-    TOK_PLUS   shift, and go to state 55
-    TOK_MINUS  shift, and go to state 56
+    TOK_PLUS   shift, and go to state 58
+    TOK_MINUS  shift, and go to state 59
 
     $default  reduce using rule 40 (comparison_expr)
 
 
-State 74
+State 78
 
    41 comparison_expr: comparison_expr TOK_LE add_expr •
    45 add_expr: add_expr • TOK_PLUS mult_expr
    46         | add_expr • TOK_MINUS mult_expr
 
-    TOK_PLUS   shift, and go to state 55
-    TOK_MINUS  shift, and go to state 56
+    TOK_PLUS   shift, and go to state 58
+    TOK_MINUS  shift, and go to state 59
 
     $default  reduce using rule 41 (comparison_expr)
 
 
-State 75
+State 79
 
    42 comparison_expr: comparison_expr TOK_GT add_expr •
    45 add_expr: add_expr • TOK_PLUS mult_expr
    46         | add_expr • TOK_MINUS mult_expr
 
-    TOK_PLUS   shift, and go to state 55
-    TOK_MINUS  shift, and go to state 56
+    TOK_PLUS   shift, and go to state 58
+    TOK_MINUS  shift, and go to state 59
 
     $default  reduce using rule 42 (comparison_expr)
 
 
-State 76
+State 80
 
    43 comparison_expr: comparison_expr TOK_GE add_expr •
    45 add_expr: add_expr • TOK_PLUS mult_expr
    46         | add_expr • TOK_MINUS mult_expr
 
-    TOK_PLUS   shift, and go to state 55
-    TOK_MINUS  shift, and go to state 56
+    TOK_PLUS   shift, and go to state 58
+    TOK_MINUS  shift, and go to state 59
 
     $default  reduce using rule 43 (comparison_expr)
 
 
-State 77
+State 81
 
    45 add_expr: add_expr TOK_PLUS mult_expr •
    48 mult_expr: mult_expr • TOK_STAR unary_expr
    49          | mult_expr • TOK_SLASH unary_expr
    50          | mult_expr • TOK_MOD unary_expr
 
-    TOK_STAR   shift, and go to state 57
-    TOK_SLASH  shift, and go to state 58
-    TOK_MOD    shift, and go to state 59
+    TOK_STAR   shift, and go to state 60
+    TOK_SLASH  shift, and go to state 61
+    TOK_MOD    shift, and go to state 62
 
     $default  reduce using rule 45 (add_expr)
 
 
-State 78
+State 82
 
    46 add_expr: add_expr TOK_MINUS mult_expr •
    48 mult_expr: mult_expr • TOK_STAR unary_expr
    49          | mult_expr • TOK_SLASH unary_expr
    50          | mult_expr • TOK_MOD unary_expr
 
-    TOK_STAR   shift, and go to state 57
-    TOK_SLASH  shift, and go to state 58
-    TOK_MOD    shift, and go to state 59
+    TOK_STAR   shift, and go to state 60
+    TOK_SLASH  shift, and go to state 61
+    TOK_MOD    shift, and go to state 62
 
     $default  reduce using rule 46 (add_expr)
 
 
-State 79
+State 83
 
    48 mult_expr: mult_expr TOK_STAR unary_expr •
 
     $default  reduce using rule 48 (mult_expr)
 
 
-State 80
+State 84
 
    49 mult_expr: mult_expr TOK_SLASH unary_expr •
 
     $default  reduce using rule 49 (mult_expr)
 
 
-State 81
+State 85
 
    50 mult_expr: mult_expr TOK_MOD unary_expr •
 
     $default  reduce using rule 50 (mult_expr)
 
 
-State 82
+State 86
 
    23 while_stmt: KW_WHILE expr COLON NEWLINE • block
 
-    INDENT  shift, and go to state 89
+    INDENT  shift, and go to state 93
 
-    block  go to state 91
+    block  go to state 95
 
 
-State 83
+State 87
 
    28 param_list: IDENT •
 
     $default  reduce using rule 28 (param_list)
 
 
-State 84
+State 88
 
    24 func_def: KW_DEF IDENT LPAREN opt_params • RPAREN COLON NEWLINE block
 
-    RPAREN  shift, and go to state 92
+    RPAREN  shift, and go to state 96
 
 
-State 85
+State 89
 
    27 opt_params: param_list •
    29 param_list: param_list • COMMA IDENT
 
-    COMMA  shift, and go to state 93
+    COMMA  shift, and go to state 97
 
     $default  reduce using rule 27 (opt_params)
 
 
-State 86
+State 90
 
    11 print_stmt: KW_PRINT LPAREN expr RPAREN •
 
     $default  reduce using rule 11 (print_stmt)
 
 
-State 87
+State 91
 
-   58 call_expr: IDENT LPAREN opt_args RPAREN •
+   59 call_expr: IDENT LPAREN opt_args RPAREN •
 
-    $default  reduce using rule 58 (call_expr)
-
-
-State 88
-
-   62 arg_list: arg_list COMMA • expr
-
-    TOK_NOT    shift, and go to state 20
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
-
-    expr             go to state 94
-    or_expr          go to state 27
-    and_expr         go to state 28
-    not_expr         go to state 29
-    comparison_expr  go to state 30
-    add_expr         go to state 31
-    mult_expr        go to state 32
-    unary_expr       go to state 33
-    primary_expr     go to state 34
-    call_expr        go to state 35
+    $default  reduce using rule 59 (call_expr)
 
 
-State 89
+State 92
+
+   64 arg_list: arg_list COMMA • expr
+
+    KW_INPUT   shift, and go to state 20
+    TOK_NOT    shift, and go to state 21
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
+
+    expr             go to state 98
+    or_expr          go to state 28
+    and_expr         go to state 29
+    not_expr         go to state 30
+    comparison_expr  go to state 31
+    add_expr         go to state 32
+    mult_expr        go to state 33
+    unary_expr       go to state 34
+    primary_expr     go to state 35
+    call_expr        go to state 36
+    input_expr       go to state 37
+
+
+State 93
 
    25 block: INDENT • stmt_list DEDENT
 
     $default  reduce using rule 2 (stmt_list)
 
-    stmt_list  go to state 95
+    stmt_list  go to state 99
 
 
-State 90
+State 94
 
    17 if_stmt: KW_IF expr COLON NEWLINE block • elif_list opt_else
 
     $default  reduce using rule 18 (elif_list)
 
-    elif_list  go to state 96
+    elif_list  go to state 100
 
 
-State 91
+State 95
 
    23 while_stmt: KW_WHILE expr COLON NEWLINE block •
 
     $default  reduce using rule 23 (while_stmt)
 
 
-State 92
+State 96
 
    24 func_def: KW_DEF IDENT LPAREN opt_params RPAREN • COLON NEWLINE block
 
-    COLON  shift, and go to state 97
+    COLON  shift, and go to state 101
 
 
-State 93
+State 97
 
    29 param_list: param_list COMMA • IDENT
 
-    IDENT  shift, and go to state 98
+    IDENT  shift, and go to state 102
 
 
-State 94
+State 98
 
-   62 arg_list: arg_list COMMA expr •
+   64 arg_list: arg_list COMMA expr •
 
-    $default  reduce using rule 62 (arg_list)
+    $default  reduce using rule 64 (arg_list)
 
 
-State 95
+State 99
 
     3 stmt_list: stmt_list • stmt
    25 block: INDENT stmt_list • DEDENT
@@ -1308,7 +1389,7 @@ State 95
     KW_DEF     shift, and go to state 6
     KW_RETURN  shift, and go to state 7
     KW_PRINT   shift, and go to state 8
-    DEDENT     shift, and go to state 99
+    DEDENT     shift, and go to state 103
     NEWLINE    shift, and go to state 9
     IDENT      shift, and go to state 10
 
@@ -1323,148 +1404,150 @@ State 95
     func_def       go to state 19
 
 
-State 96
+State 100
 
    17 if_stmt: KW_IF expr COLON NEWLINE block elif_list • opt_else
    19 elif_list: elif_list • elif_clause
 
-    KW_ELIF  shift, and go to state 100
-    KW_ELSE  shift, and go to state 101
+    KW_ELIF  shift, and go to state 104
+    KW_ELSE  shift, and go to state 105
 
     $default  reduce using rule 21 (opt_else)
 
-    elif_clause  go to state 102
-    opt_else     go to state 103
+    elif_clause  go to state 106
+    opt_else     go to state 107
 
 
-State 97
+State 101
 
    24 func_def: KW_DEF IDENT LPAREN opt_params RPAREN COLON • NEWLINE block
 
-    NEWLINE  shift, and go to state 104
+    NEWLINE  shift, and go to state 108
 
 
-State 98
+State 102
 
    29 param_list: param_list COMMA IDENT •
 
     $default  reduce using rule 29 (param_list)
 
 
-State 99
+State 103
 
    25 block: INDENT stmt_list DEDENT •
 
     $default  reduce using rule 25 (block)
 
 
-State 100
+State 104
 
    20 elif_clause: KW_ELIF • expr COLON NEWLINE block
 
-    TOK_NOT    shift, and go to state 20
-    TOK_MINUS  shift, and go to state 21
-    LPAREN     shift, and go to state 22
-    INT_LIT    shift, and go to state 23
-    BOOL_LIT   shift, and go to state 24
-    IDENT      shift, and go to state 25
+    KW_INPUT   shift, and go to state 20
+    TOK_NOT    shift, and go to state 21
+    TOK_MINUS  shift, and go to state 22
+    LPAREN     shift, and go to state 23
+    INT_LIT    shift, and go to state 24
+    BOOL_LIT   shift, and go to state 25
+    IDENT      shift, and go to state 26
 
-    expr             go to state 105
-    or_expr          go to state 27
-    and_expr         go to state 28
-    not_expr         go to state 29
-    comparison_expr  go to state 30
-    add_expr         go to state 31
-    mult_expr        go to state 32
-    unary_expr       go to state 33
-    primary_expr     go to state 34
-    call_expr        go to state 35
+    expr             go to state 109
+    or_expr          go to state 28
+    and_expr         go to state 29
+    not_expr         go to state 30
+    comparison_expr  go to state 31
+    add_expr         go to state 32
+    mult_expr        go to state 33
+    unary_expr       go to state 34
+    primary_expr     go to state 35
+    call_expr        go to state 36
+    input_expr       go to state 37
 
 
-State 101
+State 105
 
    22 opt_else: KW_ELSE • COLON NEWLINE block
 
-    COLON  shift, and go to state 106
+    COLON  shift, and go to state 110
 
 
-State 102
+State 106
 
    19 elif_list: elif_list elif_clause •
 
     $default  reduce using rule 19 (elif_list)
 
 
-State 103
+State 107
 
    17 if_stmt: KW_IF expr COLON NEWLINE block elif_list opt_else •
 
     $default  reduce using rule 17 (if_stmt)
 
 
-State 104
+State 108
 
    24 func_def: KW_DEF IDENT LPAREN opt_params RPAREN COLON NEWLINE • block
 
-    INDENT  shift, and go to state 89
+    INDENT  shift, and go to state 93
 
-    block  go to state 107
+    block  go to state 111
 
 
-State 105
+State 109
 
    20 elif_clause: KW_ELIF expr • COLON NEWLINE block
 
-    COLON  shift, and go to state 108
+    COLON  shift, and go to state 112
 
 
-State 106
+State 110
 
    22 opt_else: KW_ELSE COLON • NEWLINE block
 
-    NEWLINE  shift, and go to state 109
+    NEWLINE  shift, and go to state 113
 
 
-State 107
+State 111
 
    24 func_def: KW_DEF IDENT LPAREN opt_params RPAREN COLON NEWLINE block •
 
     $default  reduce using rule 24 (func_def)
 
 
-State 108
+State 112
 
    20 elif_clause: KW_ELIF expr COLON • NEWLINE block
 
-    NEWLINE  shift, and go to state 110
+    NEWLINE  shift, and go to state 114
 
 
-State 109
+State 113
 
    22 opt_else: KW_ELSE COLON NEWLINE • block
 
-    INDENT  shift, and go to state 89
+    INDENT  shift, and go to state 93
 
-    block  go to state 111
+    block  go to state 115
 
 
-State 110
+State 114
 
    20 elif_clause: KW_ELIF expr COLON NEWLINE • block
 
-    INDENT  shift, and go to state 89
+    INDENT  shift, and go to state 93
 
-    block  go to state 112
+    block  go to state 116
 
 
-State 111
+State 115
 
    22 opt_else: KW_ELSE COLON NEWLINE block •
 
     $default  reduce using rule 22 (opt_else)
 
 
-State 112
+State 116
 
    20 elif_clause: KW_ELIF expr COLON NEWLINE block •
 

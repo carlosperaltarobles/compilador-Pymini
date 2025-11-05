@@ -1,0 +1,7 @@
+# Test interactivo con input()
+# Suma de dos números ingresados por el usuario
+
+x = input()
+y = input()
+suma = x + y
+print(suma)

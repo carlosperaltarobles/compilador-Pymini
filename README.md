@@ -1,6 +1,7 @@
 # PyMini - Compilador en C
 
-> **Un compilador completo para aprender cómo funcionan los compiladores desde cero**
+
+> **Compilador Python (subconjunto) en C - Versión 2.0.0**
 
 PyMini es un compilador educativo para un subconjunto simple de Python, implementado en C usando Flex y Bison.
 
@@ -428,7 +429,8 @@ resultado = nombre_funcion(arg1, arg2)
 ```
 
 ### Funciones Built-in
-- `print(expresion)` - Imprime una expresión
+- `print(expresion)` - Imprime una expresión (int o bool)
+- `input()` - Lee un entero desde la entrada estándar ✨ **NUEVO**
 
 ---
 
@@ -538,6 +540,42 @@ if es_primo(num):
     print(1)  # Es primo
 else:
     print(0)  # No es primo
+```
+
+### Ejemplo 7: Programa Interactivo ✨ **NUEVO**
+
+```python
+# Calculadora simple que lee dos números
+# y muestra su suma
+
+x = input()  # Lee el primer número
+y = input()  # Lee el segundo número
+suma = x + y
+print(suma)
+
+# Uso:
+# $ echo -e "5\n3" | ./pymini programa.pymini
+# 8
+```
+
+### Ejemplo 8: Factorial Interactivo ✨ **NUEVO**
+
+```python
+# Calcula el factorial de un número ingresado por el usuario
+
+def factorial(n):
+    if n <= 1:
+        return 1
+    else:
+        return n * factorial(n - 1)
+
+n = input()
+resultado = factorial(n)
+print(resultado)
+
+# Uso:
+# $ echo "5" | ./pymini factorial.pymini
+# 120
 ```
 
 Para más ejemplos avanzados, consulta `docs/EXAMPLES.md`.
@@ -856,7 +894,7 @@ para información más técnica y ejemplos avanzados:
 - Tests end-to-end con verificación de salida
 - Modo verbose para debugging del compilador
 
-### Fase 5 - Indentación Pythonica ✨ **NUEVO**
+### Fase 5 - Indentación Pythonica **NUEVO**
 - **Indentación significativa**: Los bloques se delimitan con indentación en lugar de llaves `{}`
 - **100% compatible con Python**: La sintaxis es ahora idéntica a Python real
 - **Tokens especiales**: INDENT, DEDENT, NEWLINE para manejar la estructura

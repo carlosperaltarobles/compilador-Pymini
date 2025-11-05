@@ -42,6 +42,19 @@ void rt_print_bool(int b) {
     printf("%s\n", b ? "True" : "False");
 }
 
+int rt_input_int(void) {
+    int value;
+    if (scanf("%d", &value) != 1) {
+        fprintf(stderr, "\n╔═══════════════════════════════════╗\n");
+        fprintf(stderr, "║   Input Error                     ║\n");
+        fprintf(stderr, "╠═══════════════════════════════════╣\n");
+        fprintf(stderr, "║ No se pudo leer un entero válido  ║\n");
+        fprintf(stderr, "╚═══════════════════════════════════╝\n\n");
+        exit(EXIT_FAILURE);
+    }
+    return value;
+}
+
 int rt_div(int a, int b) {
     if (b == 0) {
         fprintf(stderr, "\n╔═══════════════════════════════════╗\n");
