@@ -1,0 +1,2 @@
+# Error: variable usada antes de asignar
+x = y + 1

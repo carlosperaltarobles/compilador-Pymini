@@ -1,0 +1,7 @@
+# Test de operadores lógicos
+a = True
+b = False
+c = a and b
+d = a or b
+e = not c
+print(e)

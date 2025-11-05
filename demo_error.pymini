@@ -1,0 +1,5 @@
+# Este programa tiene un error semántico intencional
+# Variable no declarada
+
+x = 5
+print(y)  # Error: 'y' no está declarada

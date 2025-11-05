@@ -5,6 +5,7 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include "types.h"
 
 /* ========== Tipos de Nodos AST ========== */
 
@@ -70,6 +71,7 @@ typedef struct Ast Ast;
 struct Ast {
     AstKind kind;
     Location loc;
+    Type type;  // Tipo inferido durante análisis semántico
     
     union {
         /* AST_PROGRAM */

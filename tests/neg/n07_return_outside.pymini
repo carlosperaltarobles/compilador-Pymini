@@ -1,0 +1,3 @@
+# Error: return fuera de función
+x = 1
+return x

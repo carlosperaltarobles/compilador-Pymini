@@ -1,0 +1,2 @@
+# Error: tipo incompatible en operador aritmético
+x = True + 1

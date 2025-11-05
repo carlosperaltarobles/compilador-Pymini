@@ -1,0 +1,9 @@
+# Error: conflicto de tipos en parámetro
+def g(p):
+{
+  if p:
+  {
+    x = p + 1
+  }
+  return 0
+}

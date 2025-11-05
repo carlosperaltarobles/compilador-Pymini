@@ -1,0 +1,5 @@
+ok = True
+if ok:
+{
+  print(ok)
+}

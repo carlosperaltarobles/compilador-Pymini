@@ -20,6 +20,7 @@ static Ast* ast_alloc(AstKind kind, Location loc) {
     }
     node->kind = kind;
     node->loc = loc;
+    node->type = TY_UNKNOWN;  // Inicializar tipo como desconocido
     return node;
 }
 

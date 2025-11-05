@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "ast.h"
 #include "ast_print.h"
 #include "sema.h"
@@ -60,25 +61,34 @@ int main(int argc, char** argv) {
     /* Parseo exitoso */
     printf("========================================\n");
     printf("Parse OK\n");
-    printf("========================================\n");
+    printf("========================================\n\n");
     
     /* Imprimir el AST */
     ast_print(ast);
     
-    /* Análisis semántico (stub para fase 2) */
-    bool sema_ok = sema_analyze(ast);
-    if (!sema_ok) {
+    /* Análisis semántico (Fase 2) */
+    printf("\n========================================\n");
+    printf("Iniciando análisis semántico...\n");
+    printf("========================================\n\n");
+    
+    int errors = sema_check(ast);
+    
+    if (errors > 0) {
         fprintf(stderr, "\n========================================\n");
-        fprintf(stderr, "ERROR: Falló el análisis semántico\n");
+        fprintf(stderr, "ERROR: Análisis semántico falló con %d error(es)\n", errors);
         fprintf(stderr, "========================================\n");
         ast_free(ast);
         return 1;
     }
     
+    printf("\n========================================\n");
+    printf("Semantic OK\n");
+    printf("========================================\n");
+    
     /* Liberar memoria */
     ast_free(ast);
     
-    printf("========================================\n");
+    printf("\n========================================\n");
     printf("Compilación completada exitosamente\n");
     printf("========================================\n\n");
     
