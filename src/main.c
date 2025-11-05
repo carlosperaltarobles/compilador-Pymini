@@ -2,95 +2,39 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include "ast.h"
-#include "ast_print.h"
-#include "sema.h"
-
-/* Declaraciones externas del parser */
-extern Ast* parse_file(const char* filename);
-extern int parse_error_count;
-
-/* ========== Función Principal ========== */
-
-void print_usage(const char* program_name) {
-    fprintf(stderr, "Uso: %s <archivo.pymini>\n", program_name);
-    fprintf(stderr, "\n");
-    fprintf(stderr, "Compilador PyMini - Fase 1: Front-end (Lexer + Parser + AST)\n");
-    fprintf(stderr, "\n");
-    fprintf(stderr, "Opciones:\n");
-    fprintf(stderr, "  <archivo.pymini>   Archivo fuente de PyMini a parsear\n");
-    fprintf(stderr, "\n");
-    fprintf(stderr, "Ejemplo:\n");
-    fprintf(stderr, "  %s test.pymini\n", program_name);
-    fprintf(stderr, "\n");
-}
+#include "cli.h"
+#include "pipeline.h"
 
 int main(int argc, char** argv) {
-    /* Verificar argumentos */
-    if (argc != 2) {
-        print_usage(argv[0]);
+    CliOptions opts;
+    
+    /* Parsear argumentos de línea de comandos */
+    if (cli_parse_args(argc, argv, &opts) != 0) {
         return 1;
     }
     
-    const char* filename = argv[1];
-    
-    /* Verificar extensión del archivo (opcional) */
-    const char* ext = strrchr(filename, '.');
-    if (ext && strcmp(ext, ".pymini") != 0) {
-        fprintf(stderr, "Advertencia: el archivo no tiene extensión .pymini\n");
+    /* Mostrar ayuda o versión si se solicitó */
+    if (opts.show_help) {
+        cli_print_help(argv[0]);
+        return 0;
     }
     
-    printf("========================================\n");
-    printf("Compilador PyMini - Fase 1\n");
-    printf("========================================\n");
-    printf("Parseando: %s\n", filename);
-    printf("========================================\n\n");
-    
-    /* Parsear el archivo */
-    Ast* ast = parse_file(filename);
-    
-    if (!ast) {
-        fprintf(stderr, "\n========================================\n");
-        fprintf(stderr, "ERROR: Fallo el parseo del archivo\n");
-        fprintf(stderr, "========================================\n");
-        return 1;
+    if (opts.show_version) {
+        cli_print_version();
+        return 0;
     }
     
-    /* Parseo exitoso */
-    printf("========================================\n");
-    printf("Parse OK\n");
-    printf("========================================\n\n");
+    /* Ejecutar el pipeline de compilación */
+    PipelineResult result = pipeline_run(&opts.pipeline_opts);
     
-    /* Imprimir el AST */
-    ast_print(ast);
-    
-    /* Análisis semántico (Fase 2) */
-    printf("\n========================================\n");
-    printf("Iniciando análisis semántico...\n");
-    printf("========================================\n\n");
-    
-    int errors = sema_check(ast);
-    
-    if (errors > 0) {
-        fprintf(stderr, "\n========================================\n");
-        fprintf(stderr, "ERROR: Análisis semántico falló con %d error(es)\n", errors);
-        fprintf(stderr, "========================================\n");
-        ast_free(ast);
-        return 1;
+    /* Mostrar mensaje de error si hubo alguno */
+    if (result.error_msg) {
+        fprintf(stderr, "Error: %s\n", result.error_msg);
     }
     
-    printf("\n========================================\n");
-    printf("Semantic OK\n");
-    printf("========================================\n");
+    /* Liberar recursos */
+    int exit_code = result.exit_code;
+    pipeline_result_free(&result);
     
-    /* Liberar memoria */
-    ast_free(ast);
-    
-    printf("\n========================================\n");
-    printf("Compilación completada exitosamente\n");
-    printf("========================================\n\n");
-    
-    return 0;
+    return exit_code;
 }

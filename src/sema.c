@@ -424,8 +424,12 @@ static void sema_visit_stmt(SemaCtx* ctx, Ast* node) {
 
 /* ========== Punto de Entrada ========== */
 
-int sema_check(Ast* root) {
-    if (!root) return 0;
+SemaResult sema_check_ex(Ast* root) {
+    SemaResult result;
+    result.error_count = 0;
+    result.global_scope = NULL;
+    
+    if (!root) return result;
     
     diag_reset();
     
@@ -438,7 +442,16 @@ int sema_check(Ast* root) {
     
     sema_visit_stmt(&ctx, root);
     
-    scope_free(ctx.scope);
+    result.error_count = g_error_count;
+    result.global_scope = ctx.scope;
     
-    return g_error_count;
+    return result;
+}
+
+int sema_check(Ast* root) {
+    SemaResult result = sema_check_ex(root);
+    if (result.global_scope) {
+        scope_free(result.global_scope);
+    }
+    return result.error_count;
 }

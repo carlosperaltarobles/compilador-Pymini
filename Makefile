@@ -1,7 +1,7 @@
 # Makefile para PyMini Compiler
 
 CC = gcc
-CFLAGS = -O2 -g -Wall -Wextra -std=c11 -Wno-unused-parameter
+CFLAGS = -O2 -g -Wall -Wextra -std=c11 -Wno-unused-parameter -Wno-unused-function
 FLEX = flex
 BISON = bison
 BISON_FLAGS = -d -v
@@ -13,7 +13,9 @@ TEST_DIR = tests
 # Archivos fuente
 LEX_SRC = $(SRC_DIR)/lexer.l
 YACC_SRC = $(SRC_DIR)/parser.y
-C_SOURCES = $(SRC_DIR)/ast.c $(SRC_DIR)/ast_print.c $(SRC_DIR)/types.c $(SRC_DIR)/diag.c $(SRC_DIR)/symtab.c $(SRC_DIR)/sema.c $(SRC_DIR)/main.c
+C_SOURCES = $(SRC_DIR)/ast.c $(SRC_DIR)/ast_print.c $(SRC_DIR)/types.c $(SRC_DIR)/diag.c \
+            $(SRC_DIR)/symtab.c $(SRC_DIR)/sema.c $(SRC_DIR)/codegen_c.c $(SRC_DIR)/opt.c \
+            $(SRC_DIR)/pipeline.c $(SRC_DIR)/cli.c $(SRC_DIR)/main.c
 
 # Archivos generados
 LEX_OUT = lex.yy.c
@@ -22,7 +24,8 @@ YACC_HEADER = parser.tab.h
 YACC_OUTPUT = parser.output
 
 # Todos los objetos
-OBJS = lex.yy.o parser.tab.o ast.o ast_print.o types.o diag.o symtab.o sema.o main.o
+OBJS = lex.yy.o parser.tab.o ast.o ast_print.o types.o diag.o symtab.o sema.o \
+       codegen_c.o opt.o pipeline.o cli.o main.o
 
 .PHONY: all clean test
 
@@ -68,8 +71,24 @@ symtab.o: $(SRC_DIR)/symtab.c $(SRC_DIR)/symtab.h $(SRC_DIR)/types.h
 sema.o: $(SRC_DIR)/sema.c $(SRC_DIR)/sema.h $(SRC_DIR)/ast.h $(SRC_DIR)/types.h $(SRC_DIR)/diag.h $(SRC_DIR)/symtab.h
 	$(CC) $(CFLAGS) -c $(SRC_DIR)/sema.c -o sema.o
 
+# Compilar generación de código
+codegen_c.o: $(SRC_DIR)/codegen_c.c $(SRC_DIR)/codegen_c.h $(SRC_DIR)/ast.h $(SRC_DIR)/types.h $(SRC_DIR)/symtab.h
+	$(CC) $(CFLAGS) -c $(SRC_DIR)/codegen_c.c -o codegen_c.o
+
+# Compilar optimizaciones
+opt.o: $(SRC_DIR)/opt.c $(SRC_DIR)/opt.h $(SRC_DIR)/ast.h
+	$(CC) $(CFLAGS) -c $(SRC_DIR)/opt.c -o opt.o
+
+# Compilar pipeline
+pipeline.o: $(SRC_DIR)/pipeline.c $(SRC_DIR)/pipeline.h $(SRC_DIR)/ast.h $(SRC_DIR)/sema.h $(SRC_DIR)/opt.h $(SRC_DIR)/codegen_c.h
+	$(CC) $(CFLAGS) -c $(SRC_DIR)/pipeline.c -o pipeline.o
+
+# Compilar CLI
+cli.o: $(SRC_DIR)/cli.c $(SRC_DIR)/cli.h $(SRC_DIR)/pipeline.h
+	$(CC) $(CFLAGS) -c $(SRC_DIR)/cli.c -o cli.o
+
 # Compilar main
-main.o: $(SRC_DIR)/main.c $(SRC_DIR)/ast.h $(SRC_DIR)/ast_print.h $(SRC_DIR)/sema.h $(YACC_HEADER)
+main.o: $(SRC_DIR)/main.c $(SRC_DIR)/cli.h $(SRC_DIR)/pipeline.h
 	$(CC) $(CFLAGS) -c $(SRC_DIR)/main.c -o main.o
 
 # Enlazar todo
@@ -79,6 +98,23 @@ $(TARGET): $(OBJS)
 # Ejecutar tests semánticos (usando el script)
 test: $(TARGET)
 	@./tests/run.sh
+
+# Ejecutar tests end-to-end
+test-e2e: $(TARGET)
+	@echo "=== Ejecutando tests end-to-end ==="
+	@echo ""
+	@echo "Tests positivos:"
+	@for test_file in tests/e2e/pos/*.pymini; do \
+		./tools/build_and_run.sh $$test_file || exit 1; \
+	done
+	@echo ""
+	@echo "Tests negativos (deben fallar en runtime):"
+	@for test_file in tests/e2e/neg/*.pymini; do \
+		echo "Testing $$test_file (debe fallar)..."; \
+		./$(TARGET) --run $$test_file 2>&1 | grep -i "error" > /dev/null && echo "✓ Falló correctamente" || (echo "✗ Debió fallar"; exit 1); \
+	done
+	@echo ""
+	@echo "=== Todos los tests e2e pasaron ==="
 
 # Ejecutar solo tests positivos
 test-pos: $(TARGET)

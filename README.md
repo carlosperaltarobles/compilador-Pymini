@@ -23,7 +23,7 @@ PyMini es un compilador educativo para un subconjunto simple de Python, implemen
 
 ## ¿Qué es PyMini?
 
-PyMini es un **compilador completo en C** que procesa un subconjunto de Python. Actualmente en **Fases 1 y 2**, el compilador puede:
+PyMini es un **compilador completo en C** que procesa un subconjunto de Python. Actualmente en **Fases 1-4**, el compilador puede:
 
 **Fase 1 - Análisis Léxico y Sintáctico:**
 - **Leer** tu código fuente  
@@ -39,12 +39,19 @@ PyMini es un **compilador completo en C** que procesa un subconjunto de Python. 
 - **Construir** tabla de símbolos con alcance (scope)
 - **Reportar** errores semánticos detallados
 
-**Mostrar** la estructura del código completo y validado
+**Fase 3 - Generación de Código:**
+- **Generar** código C a partir del AST validado
+- **Compilar** con GCC para producir ejecutables nativos
+- **Runtime** con funciones de impresión y verificación de errores
+- **Protección** contra división por cero en tiempo de ejecución
 
-**NO ejecuta** el código (eso será en Fase 3: Generación de código)  
-**NO genera** código máquina todavía  
+**Fase 4 - Pipeline y Optimizaciones:**
+- **CLI completo** con múltiples modos de operación
+- **Pipeline** de compilación automatizado
+- **Optimizaciones** básicas (constant folding, dead code elimination)
+- **Ejecución** directa de programas PyMini
 
-**En resumen:** PyMini verifica que tu código esté bien escrito sintáctica y semánticamente, y te muestra cómo está estructurado internamente.
+**En resumen:** PyMini es un compilador completo que puede ejecutar programas, generando ejecutables nativos optimizados.
 
 ---
 
@@ -154,11 +161,11 @@ nota: bison puede imprimir una advertencia "1 shift/reduce conflict". es una adv
 
 ---
 
-## Demostración en Vivo
+## Demostración
 
-### Opción Rápida: Script Automático
+### Opción Rápida: script automático
 
-Para una demostración automatizada durante la presentación:
+Para una demostración automatizada durante la presentación, ejecuta el siguiente script:
 
 ```bash
 ./demo_presentacion.sh
@@ -171,12 +178,16 @@ Este script ejecutará todos los pasos de demostración automáticamente, mostra
 4. Detección de error de tipos incompatibles
 5. Ejecución de suite completa de tests
 
-### Crear tu Primer Programa PyMini (Paso a Paso)
+### Crear tu primer programa PyMini (Paso a Paso)
 
 Vamos a crear un archivo `.pymini` desde cero y compilarlo paso a paso.
 
 #### Paso 1: Crear el archivo
 
+```bash
+cat > demo.pymini << 'EOF'
+# Programa de demostración PyMini
+# Calcula el factorial de un número
 ```bash
 nano demo.pymini
 ```
@@ -278,21 +289,73 @@ Error semántico en línea 3, columna 5: tipos incompatibles en operación 'and'
 
 ---
 
-## cómo usar el compilador
+## Cómo usar el compilador
 
-ejecutar un archivo:
+PyMini ahora soporta múltiples modos de operación:
 
-```bash
-./pymini <archivo.pymini>
-```
-
-ejemplo rápido:
+### Modo 1: Compilar y ejecutar (por defecto)
 
 ```bash
-./pymini tests/pos/p01_simple.pymini
+./pymini programa.pymini
 ```
 
-esto mostrará si el análisis fue exitoso y luego imprimirá el ast.
+O explícitamente:
+
+```bash
+./pymini --run programa.pymini
+```
+
+Esto compila el programa y lo ejecuta inmediatamente, mostrando la salida.
+
+### Modo 2: Solo generar código C
+
+```bash
+./pymini --emit-c -o programa.c programa.pymini
+```
+
+Genera código C en `programa.c` sin compilarlo a binario.
+
+### Modo 3: Compilar a ejecutable
+
+```bash
+./pymini --compile -o programa programa.pymini
+```
+
+Genera un ejecutable nativo llamado `programa`.
+
+### Opciones de optimización
+
+```bash
+./pymini -O0 programa.pymini    # Sin optimizaciones (por defecto)
+./pymini -O1 programa.pymini    # Optimizaciones básicas
+```
+
+Las optimizaciones `-O1` incluyen:
+- Constant folding (evalúa `1+2*3` → `7` en tiempo de compilación)
+- Dead code elimination (elimina código inalcanzable)
+
+### Opciones adicionales
+
+```bash
+./pymini --help              # Muestra ayuda
+./pymini --version           # Muestra versión
+./pymini -v programa.pymini  # Modo verbose (muestra pasos del pipeline)
+```
+
+### Ejemplos completos
+
+```bash
+# Compilar y ejecutar con optimizaciones
+./pymini -O1 tests/e2e/pos/e02_arith.pymini
+
+# Generar código C y ver el resultado
+./pymini --emit-c -o temp.c tests/e2e/pos/e04_funcs.pymini
+cat temp.c
+
+# Compilar a ejecutable y ejecutarlo manualmente
+./pymini --compile -o mi_programa tests/e2e/pos/e03_if_while.pymini
+./mi_programa
+```
 
 ---
 
@@ -493,12 +556,13 @@ Para más ejemplos avanzados, consulta `docs/EXAMPLES.md`.
 
 ---
 
-## pruebas incluidas
+## Pruebas incluidas
 
-el repositorio incluye 14 pruebas organizadas en dos categorías:
+El repositorio incluye múltiples suites de pruebas:
 
-### Tests Positivos (deben pasar)
-Ubicados en `tests/pos/`:
+### Tests Semánticos (Fases 1-2)
+
+**Tests Positivos** - Ubicados en `tests/pos/`:
 - `p01_simple.pymini` - Asignaciones y expresiones básicas
 - `p02_if.pymini` - Condicionales if/else
 - `p03_while.pymini` - Bucles while
@@ -506,8 +570,7 @@ Ubicados en `tests/pos/`:
 - `p05_recursion.pymini` - Funciones recursivas (factorial)
 - `p06_complex.pymini` - Programa completo con múltiples funciones
 
-### Tests Negativos (deben fallar)
-Ubicados en `tests/neg/`:
+**Tests Negativos** - Ubicados en `tests/neg/`:
 - `n01_undeclared_var.pymini` - Variable no declarada
 - `n02_type_incompatible.pymini` - Tipos incompatibles
 - `n03_if_not_bool.pymini` - Condición if no booleana
@@ -517,20 +580,49 @@ Ubicados en `tests/neg/`:
 - `n07_return_outside.pymini` - Return fuera de función
 - `n08_while_not_bool.pymini` - Condición while no booleana
 
+### Tests End-to-End (Fases 3-4)
+
+**Tests Positivos** - Ubicados en `tests/e2e/pos/`:
+- `e01_hello.pymini` - Impresión básica de int y bool
+- `e02_arith.pymini` - Expresiones aritméticas
+- `e03_if_while.pymini` - Control de flujo (while)
+- `e04_funcs.pymini` - Llamadas a funciones
+- `e05_bool.pymini` - Operadores booleanos y lógica
+
+**Tests Negativos** - Ubicados en `tests/e2e/neg/`:
+- `e06_divzero.pymini` - División por cero (debe fallar en runtime)
+
 ### Ejecutar todas las pruebas
 
+**Tests semánticos:**
 ```bash
 bash tests/run.sh
+```
+
+**Tests end-to-end:**
+```bash
+make test-e2e
+```
+
+**Ambos:**
+```bash
+bash tests/run.sh && make test-e2e
 ```
 
 ### Ejecutar una prueba individual
 
 ```bash
+# Test semántico
 ./pymini tests/pos/p01_simple.pymini
-./pymini tests/neg/n01_undeclared_var.pymini
+
+# Test e2e (compila y ejecuta)
+./pymini --run tests/e2e/pos/e02_arith.pymini
+
+# Usando el helper script
+./tools/build_and_run.sh tests/e2e/pos/e01_hello.pymini
 ```
 
-si todas las pruebas pasan, el script mostrará un resumen con el estado de cada una.
+Si todas las pruebas pasan, verás mensajes de éxito para cada una.
 
 ---
 
@@ -581,19 +673,117 @@ esto es normal en esta gramática y no impide el funcionamiento.
 
 ---
 
-## nota para la exposicion
+## Nota para la exposición
 
-este proyecto fue preparado para la asignatura "compiladores" de la Universidad de Sonsonate.
+Este proyecto fue preparado para la asignatura "Compiladores" de la Universidad de Sonsonate.
 
-al entregar la exposicion, muéstren los pasos en este orden:
+### Demostración Recomendada (Fases 1-4)
 
-1. **Verificar dependencias instaladas**: `gcc --version && flex --version && bison --version`
-2. **Compilar el proyecto**: `make clean && make`
-3. **Demostración en vivo**: Crear un archivo `demo.pymini` y compilarlo (ver sección anterior)
-4. **Mostrar programa correcto**: `./pymini tests/pos/p01_simple.pymini`
-5. **Mostrar detección de errores**: `./pymini tests/neg/n01_undeclared_var.pymini`
-6. **Ejecutar suite completa**: `bash tests/run.sh` (14/14 tests pasan)
-7. **Explicar arquitectura**: Mostrar el flujo desde código fuente hasta AST validado
+Al presentar la exposición, sigue estos pasos:
+
+#### 1. Verificar dependencias
+```bash
+gcc --version && flex --version && bison --version
+```
+
+#### 2. Compilar el proyecto
+```bash
+make clean && make
+```
+
+#### 3. Demostración del CLI
+```bash
+# Mostrar ayuda
+./pymini --help
+
+# Mostrar versión
+./pymini --version
+```
+
+#### 4. Compilar y ejecutar un programa simple
+```bash
+# Ejecutar directamente
+./pymini tests/e2e/pos/e01_hello.pymini
+
+# Output esperado:
+# 1
+# True
+```
+
+#### 5. Mostrar generación de código C
+```bash
+# Generar código C sin compilar
+./pymini --emit-c -o demo.c tests/e2e/pos/e02_arith.pymini
+
+# Ver el código generado
+cat demo.c
+```
+
+#### 6. Demostrar optimizaciones
+```bash
+# Sin optimización
+./pymini -O0 --emit-c -o demo_O0.c tests/e2e/pos/e02_arith.pymini
+
+# Con optimización (constant folding)
+./pymini -O1 --emit-c -o demo_O1.c tests/e2e/pos/e02_arith.pymini
+
+# Comparar (O1 debe mostrar x = 7 directamente)
+diff demo_O0.c demo_O1.c
+```
+
+#### 7. Mostrar recursión funcional
+```bash
+# Fibonacci recursivo
+./pymini --run tests/e2e/pos/e06_recursion.pymini
+
+# Output esperado: 13
+```
+
+#### 8. Demostrar detección de errores semánticos
+```bash
+# Variable no declarada
+./pymini tests/neg/n01_undeclared.pymini
+
+# Error de tipos
+./pymini tests/neg/n02_type_op.pymini
+```
+
+#### 9. Demostrar detección de errores en runtime
+```bash
+# División por cero
+./pymini --run tests/e2e/neg/e06_divzero.pymini
+
+# Output esperado: Runtime Error: Division by zero
+```
+
+#### 10. Ejecutar suite completa de tests
+```bash
+# Tests end-to-end (compilación + ejecución)
+make test-e2e
+
+# Output esperado: Todos los tests pasan (7/7)
+```
+
+#### 11. Compilar a ejecutable standalone
+```bash
+# Generar ejecutable
+./pymini --compile -o mi_programa tests/e2e/pos/e04_funcs.pymini
+
+# Ejecutar el binario generado
+./mi_programa
+
+# Output esperado: 5
+```
+
+### Puntos Clave para Mencionar
+
+✅ **4 Fases Completas**: Lexer, Parser, Semántica, Codegen
+✅ **Genera código C nativo**: No interpretado, ejecutables reales
+✅ **Optimizaciones funcionales**: Constant folding, dead code elimination
+✅ **Runtime robusto**: Detección de división por cero
+✅ **CLI profesional**: Múltiples modos de operación
+✅ **Tests exhaustivos**: 21 tests (14 semánticos + 7 e2e)
+✅ **Recursión soportada**: Fibonacci, factorial funcionan correctamente
 
 ---
 
@@ -608,7 +798,7 @@ para información más técnica y ejemplos avanzados:
 5. `docs/ROADMAP.md` — próximas fases del proyecto
 6. `docs/CHANGELOG.md` — historial de cambios y versiones
 
-## características implementadas
+## Características implementadas
 
 ### Fase 1 - Análisis Léxico y Sintáctico
 - Tokenización completa con seguimiento de línea/columna
@@ -625,6 +815,22 @@ para información más técnica y ejemplos avanzados:
 - Validación de funciones (existencia, aridad, parámetros)
 - Detección de 8 tipos de errores semánticos
 - Análisis en dos pasadas (firmas de funciones + cuerpo completo)
+
+### Fase 3 - Generación de Código
+- Traducción de AST a código C válido
+- Runtime mínimo con funciones de impresión (int/bool)
+- Verificación de división por cero en runtime
+- Generación de función `__pymini_main` para código top-level
+- Short-circuit evaluation para operadores lógicos
+- Compilación automática con GCC
+
+### Fase 4 - Pipeline y Optimizaciones
+- CLI completo con múltiples banderas
+- Pipeline automatizado: parse → sema → opt → codegen → gcc → run
+- Constant folding (plegado de constantes)
+- Dead code elimination (eliminación de código muerto)
+- Tests end-to-end con verificación de salida
+- Modo verbose para debugging del compilador
 
 
 
