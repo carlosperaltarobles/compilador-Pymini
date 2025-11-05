@@ -159,6 +159,10 @@ static Type sema_visit_expr(SemaCtx* ctx, Ast* node) {
             node->type = TY_BOOL;
             return TY_BOOL;
         
+        case AST_STRING_LIT:
+            node->type = TY_STRING;
+            return TY_STRING;
+        
         case AST_NAME: {
             char* name = node->data.name.id;
             Symbol* sym = sym_lookup(ctx->scope, name);
@@ -296,9 +300,9 @@ static void sema_visit_stmt(SemaCtx* ctx, Ast* node) {
         
         case AST_PRINT: {
             Type expr_ty = sema_visit_expr(ctx, node->data.print.expr);
-            if (expr_ty != TY_INT && expr_ty != TY_BOOL && expr_ty != TY_ERROR) {
+            if (expr_ty != TY_INT && expr_ty != TY_BOOL && expr_ty != TY_STRING && expr_ty != TY_ERROR) {
                 diag_error(node->loc.line, node->loc.column,
-                    "print() espera int o bool (encontrado %s)", type_name(expr_ty));
+                    "print() espera int, bool o str (encontrado %s)", type_name(expr_ty));
             }
             break;
         }

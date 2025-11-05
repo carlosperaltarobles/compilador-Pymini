@@ -71,6 +71,7 @@ Location make_location(int line, int col) {
 /* Literales e identificadores */
 %token <int_val> INT_LIT
 %token <bool_val> BOOL_LIT
+%token <str_val> STRING_LIT
 %token <str_val> IDENT
 
 /* ========== No-terminales con tipos ========== */
@@ -340,6 +341,8 @@ primary_expr:
         { $$ = ast_new_int_lit($1, LOC); }
     | BOOL_LIT
         { $$ = ast_new_bool_lit($1, LOC); }
+    | STRING_LIT
+        { $$ = ast_new_string_lit($1, LOC); }
     | IDENT
         { 
             $$ = ast_new_name($1, LOC);

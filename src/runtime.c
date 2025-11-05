@@ -42,6 +42,10 @@ void rt_print_bool(int b) {
     printf("%s\n", b ? "True" : "False");
 }
 
+void rt_print_string(const char* s) {
+    printf("%s\n", s);
+}
+
 int rt_input_int(void) {
     int value;
     if (scanf("%d", &value) != 1) {

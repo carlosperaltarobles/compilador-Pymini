@@ -182,6 +182,31 @@ COMMENT     #.*
                 return INT_LIT; 
             }
 
+    /* ========== String Literals ========== */
+\"([^\"\\\n]|\\.)*\"  {
+                at_line_start = false;
+                last_was_newline = false;
+                /* Copiar el string sin las comillas */
+                int len = yyleng - 2;  /* -2 para quitar las comillas */
+                char* str = (char*)malloc(len + 1);
+                strncpy(str, yytext + 1, len);
+                str[len] = '\0';
+                yylval.str_val = str;
+                return STRING_LIT;
+            }
+
+'([^'\\\n]|\\.)*'  {
+                at_line_start = false;
+                last_was_newline = false;
+                /* Copiar el string sin las comillas */
+                int len = yyleng - 2;  /* -2 para quitar las comillas */
+                char* str = (char*)malloc(len + 1);
+                strncpy(str, yytext + 1, len);
+                str[len] = '\0';
+                yylval.str_val = str;
+                return STRING_LIT;
+            }
+
     /* ========== Espacios en Blanco (no al inicio de línea) ========== */
 [ \t]+      { /* Ignorar espacios y tabs en medio de línea */ }
 

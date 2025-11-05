@@ -182,6 +182,12 @@ void ast_print_indent(const Ast* node, int indent) {
                    node->loc.line, node->loc.column, 
                    node->data.bool_lit.value ? "True" : "False");
             break;
+        
+        case AST_STRING_LIT:
+            printf("StringLit [%d:%d] value=\"%s\"\n", 
+                   node->loc.line, node->loc.column, 
+                   node->data.string_lit.value);
+            break;
             
         case AST_PARAM_LIST:
             printf("ParamList (%zu params)\n", node->data.list.count);

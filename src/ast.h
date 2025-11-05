@@ -31,6 +31,7 @@ typedef enum {
     AST_NAME,
     AST_INT_LIT,
     AST_BOOL_LIT,
+    AST_STRING_LIT,
     
     /* Listas y auxiliares */
     AST_PARAM_LIST,
@@ -181,6 +182,11 @@ struct Ast {
             bool value;
         } bool_lit;
         
+        /* AST_STRING_LIT */
+        struct {
+            char* value;
+        } string_lit;
+        
         /* AST_PARAM_LIST / AST_ARG_LIST */
         struct {
             char** names;     // para params
@@ -216,6 +222,7 @@ Ast* ast_new_input(Location loc);
 Ast* ast_new_name(char* id, Location loc);
 Ast* ast_new_int_lit(int value, Location loc);
 Ast* ast_new_bool_lit(bool value, Location loc);
+Ast* ast_new_string_lit(char* value, Location loc);
 
 Ast* ast_new_param_list(Location loc);
 void ast_param_list_add(Ast* list, char* name);

@@ -8,6 +8,7 @@ const char* type_name(Type t) {
     switch (t) {
         case TY_INT:     return "int";
         case TY_BOOL:    return "bool";
+        case TY_STRING:  return "str";
         case TY_UNKNOWN: return "<unknown>";
         case TY_ERROR:   return "<error>";
         default:         return "<invalid>";

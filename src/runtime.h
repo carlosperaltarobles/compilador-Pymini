@@ -15,6 +15,11 @@ void rt_print_int(int x);
 void rt_print_bool(int b);
 
 /**
+ * Imprime un string seguido de nueva línea
+ */
+void rt_print_string(const char* s);
+
+/**
  * Lee un entero desde la entrada estándar
  * Retorna el entero leído
  */

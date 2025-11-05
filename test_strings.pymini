@@ -1,0 +1,12 @@
+# Test de strings en PyMini
+nombre = "Carlos"
+saludo = 'Hola PyMini'
+mensaje = "Soporte para strings!"
+
+print(nombre)
+print(saludo)
+print(mensaje)
+
+# Test con números también
+numero = 42
+print(numero)

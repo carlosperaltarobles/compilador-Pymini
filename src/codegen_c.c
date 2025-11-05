@@ -46,6 +46,8 @@ static const char* type_to_c(Type t) {
         case TY_INT:
         case TY_BOOL:
             return "int";
+        case TY_STRING:
+            return "const char*";
         default:
             return "int"; // fallback
     }
@@ -152,6 +154,22 @@ static void codegen_expr(CodegenCtx* ctx, Ast* node) {
         case AST_BOOL_LIT:
             emit_raw(ctx, "%d", node->data.bool_lit.value ? 1 : 0);
             break;
+        
+        case AST_STRING_LIT:
+            /* Escapar el string y emitir como literal de C */
+            emit_raw(ctx, "\"");
+            for (const char* p = node->data.string_lit.value; *p; p++) {
+                switch (*p) {
+                    case '\n': emit_raw(ctx, "\\n"); break;
+                    case '\t': emit_raw(ctx, "\\t"); break;
+                    case '\r': emit_raw(ctx, "\\r"); break;
+                    case '\\': emit_raw(ctx, "\\\\"); break;
+                    case '"':  emit_raw(ctx, "\\\""); break;
+                    default:   emit_raw(ctx, "%c", *p); break;
+                }
+            }
+            emit_raw(ctx, "\"");
+            break;
             
         case AST_NAME:
             emit_raw(ctx, "%s", node->data.name.id);
@@ -194,11 +212,13 @@ static void codegen_print(CodegenCtx* ctx, Ast* node) {
     assert(node->kind == AST_PRINT);
     emit_indent(ctx);
     
-    // Determinar si es bool o int según el tipo inferido
+    // Determinar el tipo según el tipo inferido
     Type expr_type = node->data.print.expr->type;
     
     if (expr_type == TY_BOOL) {
         emit_raw(ctx, "rt_print_bool(");
+    } else if (expr_type == TY_STRING) {
+        emit_raw(ctx, "rt_print_string(");
     } else {
         emit_raw(ctx, "rt_print_int(");
     }
@@ -491,7 +511,11 @@ static void codegen_func_def(CodegenCtx* ctx, Ast* node, Scope* scope) {
     // Declarar variables locales
     if (vars.count > 0) {
         for (size_t i = 0; i < vars.count; i++) {
-            emit_line(ctx, "int %s;", vars.names[i]);
+            // Buscar el tipo de la variable en la tabla de símbolos del scope global
+            // (las variables ya fueron analizadas por sema, así que sus tipos están en la tabla)
+            Symbol* sym = sym_lookup(ctx->global_scope, vars.names[i]);
+            const char* c_type = type_to_c(sym ? sym->type : TY_INT);
+            emit_line(ctx, "%s %s;", c_type, vars.names[i]);
         }
         fprintf(ctx->out, "\n");
     }
@@ -590,7 +614,10 @@ int codegen_emit_c(Ast* root, Scope* global_scope, const CodegenOptions* opts, F
     // Declarar variables globales
     if (global_vars.count > 0) {
         for (size_t i = 0; i < global_vars.count; i++) {
-            emit_line(&ctx, "int %s;", global_vars.names[i]);
+            // Buscar el tipo de la variable en el alcance global
+            Symbol* sym = sym_lookup(ctx.global_scope, global_vars.names[i]);
+            const char* c_type = type_to_c(sym ? sym->type : TY_INT);
+            emit_line(&ctx, "%s %s;", c_type, global_vars.names[i]);
         }
         fprintf(out, "\n");
     }

@@ -203,6 +203,12 @@ Ast* ast_new_bool_lit(bool value, Location loc) {
     return node;
 }
 
+Ast* ast_new_string_lit(char* value, Location loc) {
+    Ast* node = ast_alloc(AST_STRING_LIT, loc);
+    node->data.string_lit.value = value;
+    return node;
+}
+
 /* ========== Constructores: Listas de Parámetros/Argumentos ========== */
 
 Ast* ast_new_param_list(Location loc) {
@@ -280,6 +286,7 @@ const char* ast_kind_to_string(AstKind kind) {
         case AST_NAME: return "Name";
         case AST_INT_LIT: return "IntLit";
         case AST_BOOL_LIT: return "BoolLit";
+        case AST_STRING_LIT: return "StringLit";
         case AST_PARAM_LIST: return "ParamList";
         case AST_ARG_LIST: return "ArgList";
         case AST_ELIF_LIST: return "ElifList";
@@ -406,6 +413,10 @@ void ast_free(Ast* node) {
                 ast_free(node->data.list.exprs[i]);
             }
             free(node->data.list.exprs);
+            break;
+            
+        case AST_STRING_LIT:
+            free(node->data.string_lit.value);
             break;
             
         case AST_INT_LIT:
