@@ -3,6 +3,10 @@
 
 set -e
 
+# Ir al directorio raíz del proyecto
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR/.." || exit 1
+
 echo "=========================================="
 echo "PyMini - Demostración Fases 3 y 4"
 echo "Generación de Código + Pipeline + Optimizaciones"

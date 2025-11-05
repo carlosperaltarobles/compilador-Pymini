@@ -2,6 +2,10 @@
 # Script de Demostración en Vivo para PyMini
 # Universidad de Sonsonate - Compiladores
 
+# Ir al directorio raíz del proyecto
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR/.." || exit 1
+
 echo "=========================================="
 echo "   DEMOSTRACIÓN PyMini - Compilador C"
 echo "=========================================="
@@ -28,32 +32,32 @@ echo "Bison:" && bison --version | head -1
 pause
 
 echo "=== PASO 2: Programa Correcto (Factorial) ==="
-echo "Contenido de demo.pymini:"
-cat demo.pymini
+echo "Contenido de demos/demo.pymini:"
+cat demos/demo.pymini
 pause
 
-echo "Compilando demo.pymini..."
-./pymini demo.pymini
+echo "Compilando demos/demo.pymini..."
+./pymini demos/demo.pymini
 pause
 
 echo "=== PASO 3: Error Semántico (Variable no declarada) ==="
-echo "Contenido de demo_error.pymini:"
-cat demo_error.pymini
+echo "Contenido de demos/demo_error.pymini:"
+cat demos/demo_error.pymini
 pause
 
-echo "Compilando demo_error.pymini (debe fallar)..."
-./pymini demo_error.pymini
+echo "Compilando demos/demo_error.pymini (debe fallar)..."
+./pymini demos/demo_error.pymini
 echo ""
 echo "✓ El compilador detectó correctamente el error"
 pause
 
 echo "=== PASO 4: Error de Tipos ==="
-echo "Contenido de demo_tipos.pymini:"
-cat demo_tipos.pymini
+echo "Contenido de demos/demo_tipos.pymini:"
+cat demos/demo_tipos.pymini
 pause
 
-echo "Compilando demo_tipos.pymini (debe fallar)..."
-./pymini demo_tipos.pymini
+echo "Compilando demos/demo_tipos.pymini (debe fallar)..."
+./pymini demos/demo_tipos.pymini
 echo ""
 echo "✓ El compilador detectó correctamente la incompatibilidad de tipos"
 pause

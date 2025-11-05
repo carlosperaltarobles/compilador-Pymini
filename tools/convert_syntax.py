@@ -89,7 +89,7 @@ def convert_file(filepath):
     print(f"  ✓ Convertido (backup: {backup_path})")
 
 def main():
-    base_dir = Path(__file__).parent
+    base_dir = Path(__file__).parent.parent  # Subir al directorio raíz
     
     # Buscar todos los archivos .pymini
     pymini_files = []
@@ -99,8 +99,15 @@ def main():
     if tests_dir.exists():
         pymini_files.extend(tests_dir.rglob('*.pymini'))
     
-    # En el directorio raíz
-    pymini_files.extend(base_dir.glob('*.pymini'))
+    # En demos/
+    demos_dir = base_dir / 'demos'
+    if demos_dir.exists():
+        pymini_files.extend(demos_dir.glob('*.pymini'))
+    
+    # En examples/
+    examples_dir = base_dir / 'examples'
+    if examples_dir.exists():
+        pymini_files.extend(examples_dir.glob('*.pymini'))
     
     if not pymini_files:
         print("No se encontraron archivos .pymini")

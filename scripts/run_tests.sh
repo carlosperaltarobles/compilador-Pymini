@@ -12,6 +12,10 @@ total_tests=0
 passed_tests=0
 failed_tests=0
 
+# Ir al directorio raíz del proyecto
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR/.." || exit 1
+
 # Verificar que el ejecutable existe
 if [ ! -f "./pymini" ]; then
     echo "ERROR: El ejecutable './pymini' no existe."

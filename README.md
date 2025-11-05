@@ -590,7 +590,7 @@ Si tienes código PyMini antiguo que usa llaves `{}` en lugar de indentación, p
 
 ```bash
 # Convertir todos los archivos .pymini en el proyecto
-python3 convert_syntax.py
+python3 tools/convert_syntax.py
 ```
 
 **¿Qué hace el script?**
@@ -690,25 +690,60 @@ Si todas las pruebas pasan, verás mensajes de éxito para cada una.
 
 ## estructura del repositorio y documentación detallada
 
-archivos principales:
+### Estructura Principal
 
-- `src/`: código fuente en c, lexer y parser
-- `tests/`: archivos de prueba (.pymini)
-- `Makefile`: instrucciones de compilación
-- `run_tests.sh`: script para ejecutar las pruebas
-- `README.md`: este archivo (guía principal)
-- `README_FINAL.md`: resumen técnico de la fase 1
-- `docs/`: documentación detallada organizada
+```
+Compilador_Python/
+├── src/              # Código fuente del compilador (C, Flex, Bison)
+├── tests/            # Suite de tests automatizados
+│   ├── pos/          # Tests positivos (semántica correcta)
+│   ├── neg/          # Tests negativos (errores esperados)
+│   ├── e2e/          # Tests end-to-end (ejecución completa)
+│   └── manual/       # Tests manuales de desarrollo
+├── demos/            # Programas de demostración
+├── examples/         # Ejemplos interactivos con input()
+├── scripts/          # Scripts de utilidad (.sh)
+├── tools/            # Herramientas de conversión
+├── docs/             # Documentación técnica detallada
+├── Makefile          # Instrucciones de compilación
+└── README.md         # Este archivo (guía principal)
+```
 
-contenido de `docs/`:
+### Carpetas Principales
+
+- **`src/`**: Código fuente en C, lexer y parser
+- **`tests/`**: Tests organizados (pos/neg/e2e/manual)
+- **`demos/`**: Programas para demostraciones (`demo.pymini`, etc.)
+- **`examples/`**: Ejemplos interactivos con `input()`
+- **`scripts/`**: Scripts de ejecución (`run_tests.sh`, demos)
+- **`tools/`**: Herramientas de conversión de sintaxis
+- **`docs/`**: Documentación técnica organizada
+
+### Contenido de `docs/`:
 
 - `INICIO_RAPIDO.md`: guía de inicio rápido (5 minutos)
 - `ARCHITECTURE.md`: arquitectura interna del compilador
 - `EXAMPLES.md`: ejemplos de código pymini avanzados
-- `ROADMAP.md`: plan de desarrollo futuro (fases 2-5)
+- `FASE_5_INDENTACION.md`: documentación técnica de Fase 5
 - `CHANGELOG.md`: historial de cambios
 
-recomendación: si un compañero quiere más detalle técnico, abrir `README_FINAL.md` o los archivos en `docs/`.
+### Comandos Rápidos
+
+```bash
+# Compilar
+make clean && make
+
+# Ejecutar demo
+./pymini demos/demo.pymini
+
+# Ejecutar tests
+bash scripts/run_tests.sh
+
+# Convertir sintaxis antigua
+python3 tools/convert_syntax.py
+```
+
+Recomendación: si un compañero quiere más detalle técnico, abrir `README_FINAL.md` o los archivos en `docs/`.
 
 ---
 
