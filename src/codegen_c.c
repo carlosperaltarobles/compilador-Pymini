@@ -58,6 +58,16 @@ static const char* type_to_c(Type t) {
 static void codegen_bin_op(CodegenCtx* ctx, Ast* node) {
     assert(node->kind == AST_BIN_OP);
     
+    // Caso especial: concatenación de strings con +
+    if (node->data.bin_op.op == OP_ADD && node->type == TY_STRING) {
+        emit_raw(ctx, "rt_str_concat(");
+        codegen_expr(ctx, node->data.bin_op.left);
+        emit_raw(ctx, ", ");
+        codegen_expr(ctx, node->data.bin_op.right);
+        emit_raw(ctx, ")");
+        return;
+    }
+    
     // Para operadores lógicos con short-circuit, usamos && y ||
     const char* op_str = NULL;
     switch (node->data.bin_op.op) {
@@ -188,7 +198,46 @@ static void codegen_expr(CodegenCtx* ctx, Ast* node) {
             break;
         
         case AST_INPUT:
-            emit_raw(ctx, "rt_input_int()");
+            if (node->type == TY_STRING) {
+                emit_raw(ctx, "rt_input_string(");
+                if (node->data.input.prompt) {
+                    codegen_expr(ctx, node->data.input.prompt);
+                } else {
+                    emit_raw(ctx, "NULL");
+                }
+                emit_raw(ctx, ")");
+            } else {
+                emit_raw(ctx, "rt_input_int(");
+                if (node->data.input.prompt) {
+                    codegen_expr(ctx, node->data.input.prompt);
+                } else {
+                    emit_raw(ctx, "NULL");
+                }
+                emit_raw(ctx, ")");
+            }
+            break;
+        
+        case AST_INT_CONV:
+            emit_raw(ctx, "rt_str_to_int(");
+            codegen_expr(ctx, node->data.int_conv.expr);
+            emit_raw(ctx, ")");
+            break;
+        
+        case AST_STR_CONV:
+            // Llamar a rt_to_string según el tipo de la expresión
+            {
+                Type expr_ty = node->data.str_conv.expr->type;
+                if (expr_ty == TY_INT) {
+                    emit_raw(ctx, "rt_int_to_str(");
+                } else if (expr_ty == TY_BOOL) {
+                    emit_raw(ctx, "rt_bool_to_str(");
+                } else {
+                    // Ya es string, no hacer nada (identidad)
+                    emit_raw(ctx, "(");
+                }
+                codegen_expr(ctx, node->data.str_conv.expr);
+                emit_raw(ctx, ")");
+            }
             break;
             
         default:

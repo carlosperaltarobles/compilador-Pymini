@@ -51,7 +51,7 @@ Location make_location(int line, int col) {
 /* ========== Tokens ========== */
 
 /* Palabras clave */
-%token KW_IF KW_ELIF KW_ELSE KW_WHILE KW_DEF KW_RETURN KW_PRINT KW_INPUT
+%token KW_IF KW_ELIF KW_ELSE KW_WHILE KW_DEF KW_RETURN KW_PRINT KW_INPUT KW_INT KW_STR
 
 /* Operadores lógicos */
 %token TOK_AND TOK_OR TOK_NOT
@@ -72,6 +72,7 @@ Location make_location(int line, int col) {
 %token <int_val> INT_LIT
 %token <bool_val> BOOL_LIT
 %token <str_val> STRING_LIT
+%token <ast_node> F_STRING_LIT
 %token <str_val> IDENT
 
 /* ========== No-terminales con tipos ========== */
@@ -83,7 +84,7 @@ Location make_location(int line, int col) {
 %type <ast_node> while_stmt func_def block
 %type <ast_node> expr or_expr and_expr not_expr
 %type <ast_node> comparison_expr add_expr mult_expr unary_expr primary_expr
-%type <ast_node> call_expr input_expr
+%type <ast_node> call_expr input_expr int_expr str_expr
 %type <ast_node> opt_params param_list
 %type <ast_node> opt_args arg_list
 
@@ -343,6 +344,8 @@ primary_expr:
         { $$ = ast_new_bool_lit($1, LOC); }
     | STRING_LIT
         { $$ = ast_new_string_lit($1, LOC); }
+    | F_STRING_LIT
+        { $$ = $1; }
     | IDENT
         { 
             $$ = ast_new_name($1, LOC);
@@ -351,6 +354,10 @@ primary_expr:
     | call_expr
         { $$ = $1; }
     | input_expr
+        { $$ = $1; }
+    | int_expr
+        { $$ = $1; }
+    | str_expr
         { $$ = $1; }
     | LPAREN expr RPAREN
         { $$ = $2; }
@@ -365,10 +372,24 @@ call_expr:
         }
     ;
 
-/* Función input() */
+/* Función input() con prompt opcional */
 input_expr:
     KW_INPUT LPAREN RPAREN
-        { $$ = ast_new_input(LOC); }
+        { $$ = ast_new_input(NULL, LOC); }
+    | KW_INPUT LPAREN expr RPAREN
+        { $$ = ast_new_input($3, LOC); }
+    ;
+
+/* Función int() - conversión de string a int */
+int_expr:
+    KW_INT LPAREN expr RPAREN
+        { $$ = ast_new_int_conv($3, LOC); }
+    ;
+
+/* Función str() - conversión de cualquier tipo a string */
+str_expr:
+    KW_STR LPAREN expr RPAREN
+        { $$ = ast_new_str_conv($3, LOC); }
     ;
 
 /* ========== Argumentos de Función ========== */

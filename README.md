@@ -542,14 +542,14 @@ else:
     print(0)  # No es primo
 ```
 
-### Ejemplo 7: Programa Interactivo ✨ **NUEVO**
+### Ejemplo 7: Programa Interactivo  **NUEVO**
 
 ```python
 # Calculadora simple que lee dos números
 # y muestra su suma
 
-x = input()  # Lee el primer número
-y = input()  # Lee el segundo número
+x = int(input())  # Lee el primer número
+y = int(input())  # Lee el segundo número
 suma = x + y
 print(suma)
 
@@ -558,7 +558,7 @@ print(suma)
 # 8
 ```
 
-### Ejemplo 8: Factorial Interactivo ✨ **NUEVO**
+### Ejemplo 8: Factorial Interactivo **NUEVO**
 
 ```python
 # Calcula el factorial de un número ingresado por el usuario
@@ -569,7 +569,8 @@ def factorial(n):
     else:
         return n * factorial(n - 1)
 
-n = input()
+
+n = int(input('Escribe un número: '))
 resultado = factorial(n)
 print(resultado)
 

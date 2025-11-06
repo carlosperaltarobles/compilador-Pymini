@@ -21,9 +21,38 @@ void rt_print_string(const char* s);
 
 /**
  * Lee un entero desde la entrada estándar
+ * Si prompt != NULL, lo muestra antes de leer
  * Retorna el entero leído
  */
-int rt_input_int(void);
+int rt_input_int(const char* prompt);
+
+/**
+ * Lee una línea desde la entrada estándar y retorna un string (malloc'd).
+ * Si prompt != NULL, lo muestra antes de leer
+ * El caller es responsable de no modificar el buffer si es `const char*` y
+ * de liberarlo si corresponde en implementaciones futuras.
+ */
+char* rt_input_string(const char* prompt);
+
+/**
+ * Concatena dos strings y retorna un nuevo string (malloc'd)
+ */
+char* rt_str_concat(const char* a, const char* b);
+
+/**
+ * Convierte un string a int. Si la conversión falla, termina el programa con error.
+ */
+int rt_str_to_int(const char* s);
+
+/**
+ * Convierte un int a string (malloc'd)
+ */
+char* rt_int_to_str(int n);
+
+/**
+ * Convierte un bool a string (malloc'd)
+ */
+char* rt_bool_to_str(int b);
 
 /**
  * División entera con verificación de división entre cero

@@ -165,6 +165,19 @@ void ast_print_indent(const Ast* node, int indent) {
         
         case AST_INPUT:
             printf("Input [%d:%d]\n", node->loc.line, node->loc.column);
+            if (node->data.input.prompt) {
+                ast_print_indent(node->data.input.prompt, indent + 1);
+            }
+            break;
+        
+        case AST_INT_CONV:
+            printf("IntConv [%d:%d]\n", node->loc.line, node->loc.column);
+            ast_print_indent(node->data.int_conv.expr, indent + 1);
+            break;
+        
+        case AST_STR_CONV:
+            printf("StrConv [%d:%d]\n", node->loc.line, node->loc.column);
+            ast_print_indent(node->data.str_conv.expr, indent + 1);
             break;
             
         case AST_NAME:

@@ -1,0 +1,9 @@
+# Test de suma numérica con conversión explícita
+
+print('Ingresa el primer numero:')
+n1 = int(input())
+print('Ingresa el segundo numero:')
+n2 = int(input())
+suma = n1 + n2
+print('La suma es:')
+print(suma)

@@ -34,6 +34,16 @@ void rt_trace(const char* func_name, const char* event) {
     }
 }
 
+/* Helper portable para duplicar cadenas (evita dependencia de strdup explicita) */
+static char* rt_strdup(const char* s) {
+    if (!s) return NULL;
+    size_t n = strlen(s) + 1;
+    char* r = malloc(n);
+    if (!r) return NULL;
+    memcpy(r, s, n);
+    return r;
+}
+
 void rt_print_int(int x) {
     printf("%d\n", x);
 }
@@ -46,7 +56,11 @@ void rt_print_string(const char* s) {
     printf("%s\n", s);
 }
 
-int rt_input_int(void) {
+int rt_input_int(const char* prompt) {
+    if (prompt) {
+        printf("%s", prompt);
+        fflush(stdout);
+    }
     int value;
     if (scanf("%d", &value) != 1) {
         fprintf(stderr, "\n╔═══════════════════════════════════╗\n");
@@ -57,6 +71,79 @@ int rt_input_int(void) {
         exit(EXIT_FAILURE);
     }
     return value;
+}
+
+char* rt_input_string(const char* prompt) {
+    if (prompt) {
+        printf("%s", prompt);
+        fflush(stdout);
+    }
+    /* Implementación portable usando fgets en un buffer razonable. */
+    char buf[4096];
+    if (!fgets(buf, sizeof(buf), stdin)) {
+        /* EOF o error: devolver cadena vacía */
+        return rt_strdup("");
+    }
+    /* Remover salto de línea final si existe */
+    size_t l = strlen(buf);
+    if (l > 0 && buf[l - 1] == '\n') buf[l - 1] = '\0';
+    return rt_strdup(buf);
+}
+
+char* rt_str_concat(const char* a, const char* b) {
+    if (!a) a = "";
+    if (!b) b = "";
+    size_t len_a = strlen(a);
+    size_t len_b = strlen(b);
+    char* result = malloc(len_a + len_b + 1);
+    if (!result) {
+        fprintf(stderr, "\n╔═══════════════════════════════════╗\n");
+        fprintf(stderr, "║   Runtime Error                   ║\n");
+        fprintf(stderr, "╠═══════════════════════════════════╣\n");
+        fprintf(stderr, "║ Error de memoria al concatenar    ║\n");
+        fprintf(stderr, "╚═══════════════════════════════════╝\n\n");
+        exit(EXIT_FAILURE);
+    }
+    memcpy(result, a, len_a);
+    memcpy(result + len_a, b, len_b + 1);
+    return result;
+}
+
+int rt_str_to_int(const char* s) {
+    if (!s || !*s) {
+        fprintf(stderr, "\n╔═══════════════════════════════════╗\n");
+        fprintf(stderr, "║   Runtime Error                   ║\n");
+        fprintf(stderr, "╠═══════════════════════════════════╣\n");
+        fprintf(stderr, "║ No se puede convertir string      ║\n");
+        fprintf(stderr, "║ vacío a int                       ║\n");
+        fprintf(stderr, "╚═══════════════════════════════════╝\n\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    char* endptr;
+    long val = strtol(s, &endptr, 10);
+    
+    if (*endptr != '\0') {
+        fprintf(stderr, "\n╔═══════════════════════════════════╗\n");
+        fprintf(stderr, "║   Runtime Error                   ║\n");
+        fprintf(stderr, "╠═══════════════════════════════════╣\n");
+        fprintf(stderr, "║ String inválido para conversión   ║\n");
+        fprintf(stderr, "║ a int: '%s'                       ║\n", s);
+        fprintf(stderr, "╚═══════════════════════════════════╝\n\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    return (int)val;
+}
+
+char* rt_int_to_str(int n) {
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%d", n);
+    return rt_strdup(buf);
+}
+
+char* rt_bool_to_str(int b) {
+    return rt_strdup(b ? "True" : "False");
 }
 
 int rt_div(int a, int b) {

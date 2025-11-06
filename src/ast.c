@@ -180,8 +180,21 @@ Ast* ast_new_call(char* name, Ast* args, Location loc) {
     return node;
 }
 
-Ast* ast_new_input(Location loc) {
+Ast* ast_new_input(Ast* prompt, Location loc) {
     Ast* node = ast_alloc(AST_INPUT, loc);
+    node->data.input.prompt = prompt;
+    return node;
+}
+
+Ast* ast_new_int_conv(Ast* expr, Location loc) {
+    Ast* node = ast_alloc(AST_INT_CONV, loc);
+    node->data.int_conv.expr = expr;
+    return node;
+}
+
+Ast* ast_new_str_conv(Ast* expr, Location loc) {
+    Ast* node = ast_alloc(AST_STR_CONV, loc);
+    node->data.str_conv.expr = expr;
     return node;
 }
 
@@ -283,6 +296,8 @@ const char* ast_kind_to_string(AstKind kind) {
         case AST_UN_OP: return "UnOp";
         case AST_CALL: return "Call";
         case AST_INPUT: return "Input";
+        case AST_INT_CONV: return "IntConv";
+        case AST_STR_CONV: return "StrConv";
         case AST_NAME: return "Name";
         case AST_INT_LIT: return "IntLit";
         case AST_BOOL_LIT: return "BoolLit";
@@ -395,6 +410,18 @@ void ast_free(Ast* node) {
         case AST_CALL:
             free(node->data.call.name);
             ast_free(node->data.call.args);
+            break;
+            
+        case AST_INT_CONV:
+            ast_free(node->data.int_conv.expr);
+            break;
+        
+        case AST_STR_CONV:
+            ast_free(node->data.str_conv.expr);
+            break;
+        
+        case AST_INPUT:
+            ast_free(node->data.input.prompt);
             break;
             
         case AST_NAME:

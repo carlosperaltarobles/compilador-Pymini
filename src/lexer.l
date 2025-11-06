@@ -139,6 +139,8 @@ COMMENT     #.*
 "return"    { at_line_start = false; last_was_newline = false; return KW_RETURN; }
 "print"     { at_line_start = false; last_was_newline = false; return KW_PRINT; }
 "input"     { at_line_start = false; last_was_newline = false; return KW_INPUT; }
+"int"       { at_line_start = false; last_was_newline = false; return KW_INT; }
+"str"       { at_line_start = false; last_was_newline = false; return KW_STR; }
 "True"      { at_line_start = false; last_was_newline = false; yylval.bool_val = true; return BOOL_LIT; }
 "False"     { at_line_start = false; last_was_newline = false; yylval.bool_val = false; return BOOL_LIT; }
 "and"       { at_line_start = false; last_was_newline = false; return TOK_AND; }

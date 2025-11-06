@@ -1,0 +1,6 @@
+# Test equivalente a: print(f'La suma es: {n1 + n2}')
+# Usando concatenación con str()
+
+n1 = int(input('Escribe tu primer numero: '))
+n2 = int(input('Escribe tu segundo numero: '))
+print('La suma es: ' + str(n1 + n2))

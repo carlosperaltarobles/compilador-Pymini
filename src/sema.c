@@ -25,6 +25,11 @@ static Type check_bin_op_types(SemaCtx* ctx, Ast* node, Type left_ty, Type right
     
     // Operadores aritméticos
     if (op == OP_ADD || op == OP_SUB || op == OP_MUL || op == OP_DIV || op == OP_MOD) {
+        // Caso especial: + entre strings es concatenación
+        if (op == OP_ADD && left_ty == TY_STRING && right_ty == TY_STRING) {
+            return TY_STRING;
+        }
+        
         if (left_ty != TY_INT || right_ty != TY_INT) {
             diag_error(node->loc.line, node->loc.column,
                 "operador aritmético '%s' requiere int (encontrado %s y %s)",
@@ -243,10 +248,55 @@ static Type sema_visit_expr(SemaCtx* ctx, Ast* node) {
             return TY_INT;
         }
         
-        case AST_INPUT:
-            // input() siempre retorna int
+        case AST_INPUT: {
+            // Validar prompt opcional
+            if (node->data.input.prompt) {
+                Type prompt_ty = sema_visit_expr(ctx, node->data.input.prompt);
+                if (prompt_ty != TY_STRING && prompt_ty != TY_ERROR) {
+                    diag_error(node->loc.line, node->loc.column,
+                        "input() espera string como prompt (encontrado %s)", type_name(prompt_ty));
+                    node->type = TY_ERROR;
+                    return TY_ERROR;
+                }
+            }
+            // input() retorna string por defecto
+            node->type = TY_STRING;
+            return TY_STRING;
+        }
+        
+        case AST_INT_CONV: {
+            Type arg_ty = sema_visit_expr(ctx, node->data.int_conv.expr);
+            if (arg_ty == TY_ERROR) {
+                node->type = TY_ERROR;
+                return TY_ERROR;
+            }
+            // Permitir conversión de string a int
+            if (arg_ty != TY_STRING && arg_ty != TY_INT) {
+                diag_error(node->loc.line, node->loc.column,
+                    "int() espera string o int (encontrado %s)", type_name(arg_ty));
+                node->type = TY_ERROR;
+                return TY_ERROR;
+            }
             node->type = TY_INT;
             return TY_INT;
+        }
+        
+        case AST_STR_CONV: {
+            Type arg_ty = sema_visit_expr(ctx, node->data.str_conv.expr);
+            if (arg_ty == TY_ERROR) {
+                node->type = TY_ERROR;
+                return TY_ERROR;
+            }
+            // str() puede convertir int, bool o string
+            if (arg_ty != TY_INT && arg_ty != TY_BOOL && arg_ty != TY_STRING) {
+                diag_error(node->loc.line, node->loc.column,
+                    "str() espera int, bool o string (encontrado %s)", type_name(arg_ty));
+                node->type = TY_ERROR;
+                return TY_ERROR;
+            }
+            node->type = TY_STRING;
+            return TY_STRING;
+        }
         
         default:
             diag_error(node->loc.line, node->loc.column,
@@ -272,6 +322,19 @@ static void sema_visit_stmt(SemaCtx* ctx, Ast* node) {
             Ast* value = node->data.assign.value;
             
             Type value_ty = sema_visit_expr(ctx, value);
+
+            /* Si la RHS es input() y ya existe una variable con tipo conocido,
+             * forzamos el tipo de la expresión input() al tipo de la variable.
+             * Esto permite que input() produzca int cuando la variable ya fue
+             * declarada como int (por ejemplo parámetros de funciones).
+             */
+            if (value && value->kind == AST_INPUT) {
+                Symbol* existing_sym = sym_lookup_current(ctx->scope, name);
+                if (existing_sym && existing_sym->kind == SYM_VAR && existing_sym->type != TY_UNKNOWN) {
+                    value_ty = existing_sym->type;
+                    value->type = existing_sym->type;
+                }
+            }
             
             if (value_ty == TY_ERROR) return;
             

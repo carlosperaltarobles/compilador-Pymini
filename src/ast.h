@@ -28,6 +28,8 @@ typedef enum {
     AST_UN_OP,
     AST_CALL,
     AST_INPUT,
+    AST_INT_CONV,
+    AST_STR_CONV,
     AST_NAME,
     AST_INT_LIT,
     AST_BOOL_LIT,
@@ -187,6 +189,21 @@ struct Ast {
             char* value;
         } string_lit;
         
+        /* AST_INT_CONV */
+        struct {
+            Ast* expr;
+        } int_conv;
+        
+        /* AST_STR_CONV */
+        struct {
+            Ast* expr;
+        } str_conv;
+        
+        /* AST_INPUT */
+        struct {
+            Ast* prompt;  // expresión string opcional para el prompt
+        } input;
+        
         /* AST_PARAM_LIST / AST_ARG_LIST */
         struct {
             char** names;     // para params
@@ -218,7 +235,9 @@ Ast* ast_new_block(Ast* stmts, Location loc);
 Ast* ast_new_bin_op(OpKind op, Ast* left, Ast* right, Location loc);
 Ast* ast_new_un_op(OpKind op, Ast* operand, Location loc);
 Ast* ast_new_call(char* name, Ast* args, Location loc);
-Ast* ast_new_input(Location loc);
+Ast* ast_new_input(Ast* prompt, Location loc);
+Ast* ast_new_int_conv(Ast* expr, Location loc);
+Ast* ast_new_str_conv(Ast* expr, Location loc);
 Ast* ast_new_name(char* id, Location loc);
 Ast* ast_new_int_lit(int value, Location loc);
 Ast* ast_new_bool_lit(bool value, Location loc);
