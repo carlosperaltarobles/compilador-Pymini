@@ -1,0 +1,4 @@
+# Error: condición de if debe ser bool
+if 3:
+    print(1)
+

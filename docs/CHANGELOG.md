@@ -5,6 +5,74 @@ Todos los cambios notables del proyecto se documentan en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 
+## [2.0.0] - 2025-11-05 - FASE 5 FINAL
+
+### ✨ Añadido
+
+#### Indentación Significativa (Cambio Principal)
+- **Sistema completo de indentación estilo Python**
+- Tokens INDENT, DEDENT, NEWLINE para manejo de bloques
+- Pila de indentación con soporte para 100 niveles de anidamiento
+- Estados de Flex (INDENT_STATE) para detección correcta de indentación
+- Wrapper `real_yylex()` para manejo de tokens pendientes
+- Generación automática de múltiples DEDENT al cambiar niveles
+
+#### Detección de Errores de Indentación
+- Detección de mezcla de tabs y espacios
+- Validación de niveles de indentación consistentes
+- Error al usar tabs (solo espacios permitidos)
+- Mensajes de error descriptivos con línea y columna
+
+#### Gramática Actualizada
+- Eliminación completa de tokens LBRACE/RBRACE
+- Actualización de todas las reglas de bloques a INDENT/DEDENT
+- Soporte para NEWLINE como terminador de sentencias
+- Manejo correcto de líneas vacías
+- Sintaxis 100% compatible con Python (para el subconjunto soportado)
+
+### 🔄 Cambiado
+
+#### Sintaxis del Lenguaje
+- **BREAKING**: Los bloques ahora usan indentación en lugar de llaves `{}`
+- Los `if`, `elif`, `else`, `while`, `def` requieren `:` seguido de NEWLINE y bloque indentado
+- Las sentencias simples deben terminar con NEWLINE
+- Compatibilidad total con sintaxis Python
+
+#### Lexer
+- Rediseño completo del manejo de inicio de línea
+- Uso de estados exclusivos para separar detección de indentación
+- Manejo especial de EOF para generar DEDENT pendientes
+- Procesamiento correcto de líneas vacías y comentarios
+
+#### Parser
+- Reglas actualizadas para aceptar INDENT/DEDENT
+- Manejo de NEWLINE en gramática
+- Mejor manejo de líneas vacías (se ignoran en el AST)
+
+### 📚 Documentación
+
+- Actualización completa de README.md con nueva sintaxis
+- Creación de FASE_5_INDENTACION.md con detalles técnicos
+- Actualización de todos los ejemplos de código
+- Conversión de sintaxis de llaves a indentación en toda la documentación
+
+### 🧪 Tests
+
+- Creación de tests específicos para indentación:
+  - `test_simple_indent.pymini`: Sentencias sin bloques
+  - `test_if_only.pymini`: Bloque único
+  - `test_dedent.pymini`: Bloques con DEDENT
+  - `test_indent.pymini`: Bloques anidados
+  - `test_func.pymini`: Funciones con código después
+- Todos los tests pasan exitosamente
+
+### 🐛 Correcciones
+
+- Fix: Detección correcta de indentación después de líneas vacías
+- Fix: Generación de DEDENT al final del archivo
+- Fix: Manejo de múltiples niveles de DEDENT simultáneos
+- Fix: Prevención de consumo prematuro de tokens por patrones de palabras clave
+
 ## [1.0.0] - 2025-11-03
 
 ### ✨ Añadido

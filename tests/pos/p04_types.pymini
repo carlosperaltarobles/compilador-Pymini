@@ -1,0 +1,7 @@
+# Test de inferencia de tipos con if explícito
+def f(a):
+    x = 1
+    if a > 0:
+        x = x + 1
+    return x
+

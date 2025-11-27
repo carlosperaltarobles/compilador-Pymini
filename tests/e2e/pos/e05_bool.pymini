@@ -1,0 +1,10 @@
+x = True
+y = False
+
+if x and y:
+    print(True)
+else:
+    print(False)
+
+print(not True or False)
+

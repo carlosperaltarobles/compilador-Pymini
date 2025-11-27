@@ -162,6 +162,23 @@ void ast_print_indent(const Ast* node, int indent) {
                 printf("(no arguments)\n");
             }
             break;
+        
+        case AST_INPUT:
+            printf("Input [%d:%d]\n", node->loc.line, node->loc.column);
+            if (node->data.input.prompt) {
+                ast_print_indent(node->data.input.prompt, indent + 1);
+            }
+            break;
+        
+        case AST_INT_CONV:
+            printf("IntConv [%d:%d]\n", node->loc.line, node->loc.column);
+            ast_print_indent(node->data.int_conv.expr, indent + 1);
+            break;
+        
+        case AST_STR_CONV:
+            printf("StrConv [%d:%d]\n", node->loc.line, node->loc.column);
+            ast_print_indent(node->data.str_conv.expr, indent + 1);
+            break;
             
         case AST_NAME:
             printf("Name [%d:%d] id='%s'\n", 
@@ -177,6 +194,12 @@ void ast_print_indent(const Ast* node, int indent) {
             printf("BoolLit [%d:%d] value=%s\n", 
                    node->loc.line, node->loc.column, 
                    node->data.bool_lit.value ? "True" : "False");
+            break;
+        
+        case AST_STRING_LIT:
+            printf("StringLit [%d:%d] value=\"%s\"\n", 
+                   node->loc.line, node->loc.column, 
+                   node->data.string_lit.value);
             break;
             
         case AST_PARAM_LIST:

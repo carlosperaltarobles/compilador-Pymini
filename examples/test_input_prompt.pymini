@@ -1,0 +1,7 @@
+# Test con input(prompt) - sintaxis simplificada
+
+n1 = int(input('Escribe tu primer numero: '))
+n2 = int(input('Escribe tu segundo numero: '))
+suma = n1 + n2
+print('La suma es:')
+print(suma)

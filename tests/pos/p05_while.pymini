@@ -1,0 +1,6 @@
+# Test de bucle while con variables locales
+i = 0
+while i < 5:
+    print(i)
+    i = i + 1
+

@@ -1,142 +1,529 @@
-/* sema.c - Implementación del Análisis Semántico (stub para fase 2) */
+/* sema.c - Análisis Semántico para PyMini */
 
 #include "sema.h"
-#include <stdlib.h>
-#include <string.h>
+#include "diag.h"
+#include "types.h"
 #include <stdio.h>
+#include <string.h>
 
-/* Declarar strdup si no está disponible */
-#ifndef _GNU_SOURCE
-extern char *strdup(const char *s);
-#endif
+/* ========== Declaraciones Forward ========== */
 
-/* ========== Tabla de Símbolos ========== */
+static Type sema_visit_expr(SemaCtx* ctx, Ast* node);
+static void sema_visit_stmt(SemaCtx* ctx, Ast* node);
+static void sema_collect_functions(SemaCtx* ctx, Ast* node);
 
-SymbolTable* symtab_new(SymbolTable* parent) {
-    SymbolTable* table = (SymbolTable*)calloc(1, sizeof(SymbolTable));
-    if (!table) {
-        fprintf(stderr, "Error: no se pudo asignar memoria para la tabla de símbolos\n");
-        exit(1);
+/* ========== Utilidades de Chequeo de Tipos ========== */
+
+static Type check_bin_op_types(SemaCtx* ctx, Ast* node, Type left_ty, Type right_ty) {
+    (void)ctx;
+    
+    if (left_ty == TY_ERROR || right_ty == TY_ERROR) {
+        return TY_ERROR;
     }
-    table->symbols = NULL;
-    table->count = 0;
-    table->capacity = 0;
-    table->parent = parent;
-    return table;
+    
+    OpKind op = node->data.bin_op.op;
+    
+    // Operadores aritméticos
+    if (op == OP_ADD || op == OP_SUB || op == OP_MUL || op == OP_DIV || op == OP_MOD) {
+        // Caso especial: + entre strings es concatenación
+        if (op == OP_ADD && left_ty == TY_STRING && right_ty == TY_STRING) {
+            return TY_STRING;
+        }
+        
+        if (left_ty != TY_INT || right_ty != TY_INT) {
+            diag_error(node->loc.line, node->loc.column,
+                "operador aritmético '%s' requiere int (encontrado %s y %s)",
+                op_kind_to_string(op), type_name(left_ty), type_name(right_ty));
+            return TY_ERROR;
+        }
+        return TY_INT;
+    }
+    
+    // Comparaciones de igualdad
+    if (op == OP_EQ || op == OP_NE) {
+        if (!types_compatible(left_ty, right_ty)) {
+            diag_error(node->loc.line, node->loc.column,
+                "comparación de tipos incompatibles (%s vs %s)",
+                type_name(left_ty), type_name(right_ty));
+            return TY_ERROR;
+        }
+        return TY_BOOL;
+    }
+    
+    // Comparaciones relacionales
+    if (op == OP_LT || op == OP_LE || op == OP_GT || op == OP_GE) {
+        if (left_ty != TY_INT || right_ty != TY_INT) {
+            diag_error(node->loc.line, node->loc.column,
+                "comparación '%s' requiere int (encontrado %s y %s)",
+                op_kind_to_string(op), type_name(left_ty), type_name(right_ty));
+            return TY_ERROR;
+        }
+        return TY_BOOL;
+    }
+    
+    // Operadores lógicos
+    if (op == OP_AND || op == OP_OR) {
+        if (left_ty != TY_BOOL || right_ty != TY_BOOL) {
+            diag_error(node->loc.line, node->loc.column,
+                "operador lógico '%s' requiere bool (encontrado %s y %s)",
+                op_kind_to_string(op), type_name(left_ty), type_name(right_ty));
+            return TY_ERROR;
+        }
+        return TY_BOOL;
+    }
+    
+    diag_error(node->loc.line, node->loc.column,
+        "operador binario desconocido");
+    return TY_ERROR;
 }
 
-void symtab_free(SymbolTable* table) {
-    if (!table) return;
+static Type check_un_op_types(SemaCtx* ctx, Ast* node, Type operand_ty) {
+    (void)ctx;
     
-    for (size_t i = 0; i < table->count; i++) {
-        free(table->symbols[i]->name);
-        free(table->symbols[i]);
+    if (operand_ty == TY_ERROR) {
+        return TY_ERROR;
     }
-    free(table->symbols);
-    free(table);
+    
+    OpKind op = node->data.un_op.op;
+    
+    // Negación aritmética
+    if (op == OP_NEG || op == OP_ADD) {  // unario + también existe
+        if (operand_ty != TY_INT) {
+            diag_error(node->loc.line, node->loc.column,
+                "operador unario '%s' requiere int (encontrado %s)",
+                op_kind_to_string(op), type_name(operand_ty));
+            return TY_ERROR;
+        }
+        return TY_INT;
+    }
+    
+    // Negación lógica
+    if (op == OP_NOT) {
+        if (operand_ty != TY_BOOL) {
+            diag_error(node->loc.line, node->loc.column,
+                "operador 'not' requiere bool (encontrado %s)",
+                type_name(operand_ty));
+            return TY_ERROR;
+        }
+        return TY_BOOL;
+    }
+    
+    diag_error(node->loc.line, node->loc.column,
+        "operador unario desconocido");
+    return TY_ERROR;
 }
 
-bool symtab_add(SymbolTable* table, const char* name, SymbolKind kind, DataType type, Location loc) {
-    if (!table || !name) return false;
+/* ========== Pase 0: Recolección de Firmas de Funciones ========== */
+
+static void sema_collect_functions(SemaCtx* ctx, Ast* node) {
+    if (!node) return;
     
-    /* Verificar si el símbolo ya existe (stub simple) */
-    for (size_t i = 0; i < table->count; i++) {
-        if (strcmp(table->symbols[i]->name, name) == 0) {
-            /* Ya existe - en fase 2 reportaremos error */
-            return false;
+    
+    if (node->kind == AST_PROGRAM) {
+        sema_collect_functions(ctx, node->data.program.body);
+        return;
+    }
+    
+    if (node->kind == AST_STMT_LIST) {
+        for (size_t i = 0; i < node->data.stmt_list.count; i++) {
+            Ast* stmt = node->data.stmt_list.stmts[i];
+            if (stmt->kind == AST_FUNC_DEF) {
+                char* name = stmt->data.func_def.name;
+                
+                Symbol* existing = sym_lookup_current(ctx->scope, name);
+                if (existing) {
+                    diag_error(stmt->loc.line, stmt->loc.column,
+                        "función '%s' ya declarada", name);
+                    continue;
+                }
+                
+                // Contar parámetros
+                int arity = 0;
+                if (stmt->data.func_def.params && stmt->data.func_def.params->kind == AST_PARAM_LIST) {
+                    arity = (int)stmt->data.func_def.params->data.list.count;
+                }
+                
+                Symbol func = sym_make_func(name, arity);
+                sym_insert(ctx->scope, func);
+            }
         }
     }
+}
+
+/* ========== Visitador de Expresiones ========== */
+
+static Type sema_visit_expr(SemaCtx* ctx, Ast* node) {
+    if (!node) return TY_UNKNOWN;
     
-    /* Expandir si es necesario */
-    if (table->count >= table->capacity) {
-        size_t new_cap = table->capacity == 0 ? 16 : table->capacity * 2;
-        Symbol** new_syms = (Symbol**)realloc(table->symbols, new_cap * sizeof(Symbol*));
-        if (!new_syms) {
-            fprintf(stderr, "Error: no se pudo expandir la tabla de símbolos\n");
-            exit(1);
+    switch (node->kind) {
+        case AST_INT_LIT:
+            node->type = TY_INT;
+            return TY_INT;
+        
+        case AST_BOOL_LIT:
+            node->type = TY_BOOL;
+            return TY_BOOL;
+        
+        case AST_STRING_LIT:
+            node->type = TY_STRING;
+            return TY_STRING;
+        
+        case AST_NAME: {
+            char* name = node->data.name.id;
+            Symbol* sym = sym_lookup(ctx->scope, name);
+            
+            if (!sym) {
+                diag_error(node->loc.line, node->loc.column,
+                    "variable '%s' no declarada o usada antes de asignar", name);
+                node->type = TY_ERROR;
+                return TY_ERROR;
+            }
+            
+            if (sym->kind == SYM_FUNC) {
+                diag_error(node->loc.line, node->loc.column,
+                    "'%s' es una función, no una variable", name);
+                node->type = TY_ERROR;
+                return TY_ERROR;
+            }
+            
+            node->type = sym->type;
+            return sym->type;
         }
-        table->symbols = new_syms;
-        table->capacity = new_cap;
-    }
-    
-    /* Crear el nuevo símbolo */
-    Symbol* sym = (Symbol*)calloc(1, sizeof(Symbol));
-    if (!sym) {
-        fprintf(stderr, "Error: no se pudo asignar memoria para símbolo\n");
-        exit(1);
-    }
-    sym->name = strdup(name);
-    sym->kind = kind;
-    sym->type = type;
-    sym->loc = loc;
-    
-    table->symbols[table->count++] = sym;
-    return true;
-}
-
-Symbol* symtab_lookup(SymbolTable* table, const char* name) {
-    if (!table || !name) return NULL;
-    
-    /* Buscar en la tabla actual */
-    for (size_t i = 0; i < table->count; i++) {
-        if (strcmp(table->symbols[i]->name, name) == 0) {
-            return table->symbols[i];
+        
+        case AST_BIN_OP: {
+            Type left_ty = sema_visit_expr(ctx, node->data.bin_op.left);
+            Type right_ty = sema_visit_expr(ctx, node->data.bin_op.right);
+            Type result_ty = check_bin_op_types(ctx, node, left_ty, right_ty);
+            node->type = result_ty;
+            return result_ty;
         }
+        
+        case AST_UN_OP: {
+            Type operand_ty = sema_visit_expr(ctx, node->data.un_op.operand);
+            Type result_ty = check_un_op_types(ctx, node, operand_ty);
+            node->type = result_ty;
+            return result_ty;
+        }
+        
+        case AST_CALL: {
+            char* name = node->data.call.name;
+            Symbol* sym = sym_lookup(ctx->scope, name);
+            
+            if (!sym) {
+                diag_error(node->loc.line, node->loc.column,
+                    "función '%s' no declarada", name);
+                node->type = TY_ERROR;
+                return TY_ERROR;
+            }
+            
+            if (sym->kind != SYM_FUNC) {
+                diag_error(node->loc.line, node->loc.column,
+                    "'%s' no es una función", name);
+                node->type = TY_ERROR;
+                return TY_ERROR;
+            }
+            
+            // Contar argumentos
+            int arg_count = 0;
+            if (node->data.call.args && node->data.call.args->kind == AST_ARG_LIST) {
+                arg_count = (int)node->data.call.args->data.list.count;
+            }
+            
+            if (arg_count != sym->arity) {
+                diag_error(node->loc.line, node->loc.column,
+                    "función '%s' espera %d argumento(s), pero se le pasaron %d",
+                    name, sym->arity, arg_count);
+                node->type = TY_ERROR;
+                return TY_ERROR;
+            }
+            
+            // Visitar argumentos para chequear tipos
+            if (node->data.call.args && node->data.call.args->kind == AST_ARG_LIST) {
+                for (size_t i = 0; i < node->data.call.args->data.list.count; i++) {
+                    sema_visit_expr(ctx, node->data.call.args->data.list.exprs[i]);
+                }
+            }
+            
+            node->type = TY_INT;  // Todas las funciones retornan int por defecto
+            return TY_INT;
+        }
+        
+        case AST_INPUT: {
+            // Validar prompt opcional
+            if (node->data.input.prompt) {
+                Type prompt_ty = sema_visit_expr(ctx, node->data.input.prompt);
+                if (prompt_ty != TY_STRING && prompt_ty != TY_ERROR) {
+                    diag_error(node->loc.line, node->loc.column,
+                        "input() espera string como prompt (encontrado %s)", type_name(prompt_ty));
+                    node->type = TY_ERROR;
+                    return TY_ERROR;
+                }
+            }
+            // input() retorna string por defecto
+            node->type = TY_STRING;
+            return TY_STRING;
+        }
+        
+        case AST_INT_CONV: {
+            Type arg_ty = sema_visit_expr(ctx, node->data.int_conv.expr);
+            if (arg_ty == TY_ERROR) {
+                node->type = TY_ERROR;
+                return TY_ERROR;
+            }
+            // Permitir conversión de string a int
+            if (arg_ty != TY_STRING && arg_ty != TY_INT) {
+                diag_error(node->loc.line, node->loc.column,
+                    "int() espera string o int (encontrado %s)", type_name(arg_ty));
+                node->type = TY_ERROR;
+                return TY_ERROR;
+            }
+            node->type = TY_INT;
+            return TY_INT;
+        }
+        
+        case AST_STR_CONV: {
+            Type arg_ty = sema_visit_expr(ctx, node->data.str_conv.expr);
+            if (arg_ty == TY_ERROR) {
+                node->type = TY_ERROR;
+                return TY_ERROR;
+            }
+            // str() puede convertir int, bool o string
+            if (arg_ty != TY_INT && arg_ty != TY_BOOL && arg_ty != TY_STRING) {
+                diag_error(node->loc.line, node->loc.column,
+                    "str() espera int, bool o string (encontrado %s)", type_name(arg_ty));
+                node->type = TY_ERROR;
+                return TY_ERROR;
+            }
+            node->type = TY_STRING;
+            return TY_STRING;
+        }
+        
+        default:
+            diag_error(node->loc.line, node->loc.column,
+                "nodo inesperado en expresión");
+            node->type = TY_ERROR;
+            return TY_ERROR;
     }
-    
-    /* Buscar en la tabla padre (para scopes anidados) */
-    if (table->parent) {
-        return symtab_lookup(table->parent, name);
-    }
-    
-    return NULL;
 }
 
-/* ========== Análisis Semántico ========== */
+/* ========== Visitador de Sentencias ========== */
 
-void sema_error(Location loc, const char* msg) {
-    fprintf(stderr, "Error semántico en línea %d, columna %d: %s\n", 
-            loc.line, loc.column, msg);
-}
-
-bool sema_analyze(Ast* root) {
-    /* Stub para fase 2
-     * 
-     * En la fase 2, esta función:
-     * - Recorrerá el AST
-     * - Construirá la tabla de símbolos
-     * - Verificará que todas las variables estén declaradas
-     * - Verificará tipos
-     * - Validará que las funciones existan antes de llamarlas
-     * - Verificará que los returns estén en funciones
-     * etc.
-     * 
-     * Por ahora, simplemente retorna true para indicar éxito.
-     */
+static void sema_visit_stmt(SemaCtx* ctx, Ast* node) {
+    if (!node) return;
     
-    (void)root;  /* Evitar warning de parámetro no usado */
-    
-    /* En fase 1, no hacemos análisis semántico real */
-    return true;
-}
+    switch (node->kind) {
+        case AST_PROGRAM: {
+            sema_visit_stmt(ctx, node->data.program.body);
+            break;
+        }
+        
+        case AST_ASSIGN: {
+            char* name = node->data.assign.name;
+            Ast* value = node->data.assign.value;
+            
+            Type value_ty = sema_visit_expr(ctx, value);
 
-/* ========== Funciones Auxiliares (Stubs) ========== */
-
-const char* datatype_to_string(DataType type) {
-    switch (type) {
-        case TYPE_INT: return "int";
-        case TYPE_BOOL: return "bool";
-        case TYPE_VOID: return "void";
-        case TYPE_UNKNOWN: return "unknown";
-        default: return "?";
+            /* Si la RHS es input() y ya existe una variable con tipo conocido,
+             * forzamos el tipo de la expresión input() al tipo de la variable.
+             * Esto permite que input() produzca int cuando la variable ya fue
+             * declarada como int (por ejemplo parámetros de funciones).
+             */
+            if (value && value->kind == AST_INPUT) {
+                Symbol* existing_sym = sym_lookup_current(ctx->scope, name);
+                if (existing_sym && existing_sym->kind == SYM_VAR && existing_sym->type != TY_UNKNOWN) {
+                    value_ty = existing_sym->type;
+                    value->type = existing_sym->type;
+                }
+            }
+            
+            if (value_ty == TY_ERROR) return;
+            
+            Symbol* sym = sym_lookup_current(ctx->scope, name);
+            
+            if (!sym) {
+                Symbol var = sym_make_var(name, value_ty);
+                sym_insert(ctx->scope, var);
+            } else {
+                if (sym->kind != SYM_VAR) {
+                    diag_error(node->loc.line, node->loc.column,
+                        "'%s' ya existe como función", name);
+                    return;
+                }
+                
+                if (sym->type == TY_UNKNOWN) {
+                    sym->type = value_ty;
+                } else if (!types_compatible(sym->type, value_ty)) {
+                    diag_error(node->loc.line, node->loc.column,
+                        "reasignación de '%s' con tipo incompatible (esperado %s, encontrado %s)",
+                        name, type_name(sym->type), type_name(value_ty));
+                }
+            }
+            break;
+        }
+        
+        case AST_PRINT: {
+            Type expr_ty = sema_visit_expr(ctx, node->data.print.expr);
+            if (expr_ty != TY_INT && expr_ty != TY_BOOL && expr_ty != TY_STRING && expr_ty != TY_ERROR) {
+                diag_error(node->loc.line, node->loc.column,
+                    "print() espera int, bool o str (encontrado %s)", type_name(expr_ty));
+            }
+            break;
+        }
+        
+        case AST_RETURN: {
+            if (!ctx->in_function) {
+                diag_error(node->loc.line, node->loc.column,
+                    "return fuera de función");
+                return;
+            }
+            
+            if (node->data.ret.expr) {
+                sema_visit_expr(ctx, node->data.ret.expr);
+            }
+            break;
+        }
+        
+        case AST_IF: {
+            Type cond_ty = sema_visit_expr(ctx, node->data.if_stmt.condition);
+            if (cond_ty != TY_BOOL && cond_ty != TY_ERROR) {
+                diag_error(node->loc.line, node->loc.column,
+                    "condición de 'if' debe ser bool (encontrado %s)", type_name(cond_ty));
+            }
+            
+            sema_visit_stmt(ctx, node->data.if_stmt.then_block);
+            
+            if (node->data.if_stmt.elif_list) {
+                sema_visit_stmt(ctx, node->data.if_stmt.elif_list);
+            }
+            
+            if (node->data.if_stmt.else_block) {
+                sema_visit_stmt(ctx, node->data.if_stmt.else_block);
+            }
+            break;
+        }
+        
+        case AST_ELIF: {
+            Type cond_ty = sema_visit_expr(ctx, node->data.elif.condition);
+            if (cond_ty != TY_BOOL && cond_ty != TY_ERROR) {
+                diag_error(node->loc.line, node->loc.column,
+                    "condición de 'elif' debe ser bool (encontrado %s)", type_name(cond_ty));
+            }
+            sema_visit_stmt(ctx, node->data.elif.block);
+            break;
+        }
+        
+        case AST_ELIF_LIST: {
+            for (size_t i = 0; i < node->data.elif_list.count; i++) {
+                sema_visit_stmt(ctx, node->data.elif_list.elifs[i]);
+            }
+            break;
+        }
+        
+        case AST_ELSE:
+            sema_visit_stmt(ctx, node->data.else_stmt.block);
+            break;
+        
+        case AST_WHILE: {
+            Type cond_ty = sema_visit_expr(ctx, node->data.while_stmt.condition);
+            if (cond_ty != TY_BOOL && cond_ty != TY_ERROR) {
+                diag_error(node->loc.line, node->loc.column,
+                    "condición de 'while' debe ser bool (encontrado %s)", type_name(cond_ty));
+            }
+            
+            sema_visit_stmt(ctx, node->data.while_stmt.body);
+            break;
+        }
+        
+        case AST_FUNC_DEF: {
+            char* name = node->data.func_def.name;
+            Symbol* func_sym = sym_lookup_current(ctx->scope, name);
+            
+            if (!func_sym) {
+                diag_error(node->loc.line, node->loc.column,
+                    "función '%s' no encontrada en tabla (error interno)", name);
+                return;
+            }
+            
+            ctx->in_function = 1;
+            ctx->current_func = func_sym;
+            
+            ctx->scope = scope_push(ctx->scope);
+            
+            // Añadir parámetros al scope
+            if (node->data.func_def.params && node->data.func_def.params->kind == AST_PARAM_LIST) {
+                Ast* params = node->data.func_def.params;
+                if (params->data.list.names) {
+                    for (size_t i = 0; i < params->data.list.count; i++) {
+                        char* param_name = params->data.list.names[i];
+                        if (param_name) {
+                            Symbol param_var = sym_make_var(param_name, TY_INT);  // Por defecto int
+                            sym_insert(ctx->scope, param_var);
+                        }
+                    }
+                }
+            }
+            
+            sema_visit_stmt(ctx, node->data.func_def.body);
+            
+            ctx->scope = scope_pop(ctx->scope);
+            
+            ctx->in_function = 0;
+            ctx->current_func = NULL;
+            break;
+        }
+        
+        case AST_BLOCK: {
+            sema_visit_stmt(ctx, node->data.block.stmts);
+            break;
+        }
+        
+        case AST_STMT_LIST: {
+            for (size_t i = 0; i < node->data.stmt_list.count; i++) {
+                sema_visit_stmt(ctx, node->data.stmt_list.stmts[i]);
+            }
+            break;
+        }
+        
+        case AST_EXPR_STMT: {
+            sema_visit_expr(ctx, node);
+            break;
+        }
+        
+        default:
+            break;
     }
 }
 
-const char* symbolkind_to_string(SymbolKind kind) {
-    switch (kind) {
-        case SYM_VARIABLE: return "variable";
-        case SYM_FUNCTION: return "function";
-        case SYM_PARAMETER: return "parameter";
-        default: return "?";
+/* ========== Punto de Entrada ========== */
+
+SemaResult sema_check_ex(Ast* root) {
+    SemaResult result;
+    result.error_count = 0;
+    result.global_scope = NULL;
+    
+    if (!root) return result;
+    
+    diag_reset();
+    
+    SemaCtx ctx;
+    ctx.scope = scope_push(NULL);
+    ctx.in_function = 0;
+    ctx.current_func = NULL;
+    
+    sema_collect_functions(&ctx, root);
+    
+    sema_visit_stmt(&ctx, root);
+    
+    result.error_count = g_error_count;
+    result.global_scope = ctx.scope;
+    
+    return result;
+}
+
+int sema_check(Ast* root) {
+    SemaResult result = sema_check_ex(root);
+    if (result.global_scope) {
+        scope_free(result.global_scope);
     }
+    return result.error_count;
 }

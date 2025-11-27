@@ -1,0 +1,27 @@
+# Calculadora interactiva
+# Lee dos números y muestra operaciones básicas
+
+print(1)  # Solicitar primer número
+a = input()
+
+print(2)  # Solicitar segundo número
+b = input()
+
+# Suma
+suma = a + b
+print(suma)
+
+# Resta
+resta = a - b
+print(resta)
+
+# Multiplicación
+mult = a * b
+print(mult)
+
+# División
+if b > 0:
+    div = a / b
+    print(div)
+else:
+    print(0)

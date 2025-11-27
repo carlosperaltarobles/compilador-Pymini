@@ -1,67 +1,39 @@
-/* sema.h - Análisis Semántico para PyMini (stub para fase 2) */
-
+/**
+ * sema.h - Análisis semántico para PyMini
+ */
 #ifndef SEMA_H
 #define SEMA_H
 
 #include "ast.h"
-#include <stdbool.h>
+#include "symtab.h"
 
-/* ========== Tabla de Símbolos (Stub) ========== */
+/**
+ * Contexto del análisis semántico
+ */
+typedef struct {
+    Scope* scope;           // Scope actual
+    Symbol* current_func;   // Función actual (NULL si estamos en global)
+    int in_function;        // Flag: estamos dentro de una función
+} SemaCtx;
 
-typedef struct Symbol Symbol;
-typedef struct SymbolTable SymbolTable;
+/**
+ * Resultado del análisis semántico
+ */
+typedef struct {
+    int error_count;        // Número de errores encontrados
+    Scope* global_scope;    // Scope global (debe ser liberado por el caller)
+} SemaResult;
 
-/* Tipos de símbolos */
-typedef enum {
-    SYM_VARIABLE,
-    SYM_FUNCTION,
-    SYM_PARAMETER
-} SymbolKind;
+/**
+ * Punto de entrada del análisis semántico
+ * Retorna 0 si no hay errores, >0 si hay errores
+ */
+int sema_check(Ast* root);
 
-/* Tipos de datos */
-typedef enum {
-    TYPE_INT,
-    TYPE_BOOL,
-    TYPE_VOID,
-    TYPE_UNKNOWN
-} DataType;
+/**
+ * Versión extendida que retorna el scope global
+ * El caller es responsable de liberar el scope con scope_free()
+ */
+SemaResult sema_check_ex(Ast* root);
 
-/* Estructura de símbolo (stub) */
-struct Symbol {
-    char* name;
-    SymbolKind kind;
-    DataType type;
-    Location loc;
-};
-
-/* Tabla de símbolos (stub) */
-struct SymbolTable {
-    Symbol** symbols;
-    size_t count;
-    size_t capacity;
-    SymbolTable* parent;  /* Para soporte de scopes anidados en fase 2 */
-};
-
-/* ========== Funciones de la Tabla de Símbolos (Stubs) ========== */
-
-/* Crear una nueva tabla de símbolos */
-SymbolTable* symtab_new(SymbolTable* parent);
-
-/* Liberar la tabla de símbolos */
-void symtab_free(SymbolTable* table);
-
-/* Agregar un símbolo (stub) */
-bool symtab_add(SymbolTable* table, const char* name, SymbolKind kind, DataType type, Location loc);
-
-/* Buscar un símbolo (stub) */
-Symbol* symtab_lookup(SymbolTable* table, const char* name);
-
-/* ========== Análisis Semántico (Stub) ========== */
-
-/* Realizar análisis semántico en el AST (stub para fase 2) */
-bool sema_analyze(Ast* root);
-
-/* Imprimir errores semánticos (placeholder) */
-void sema_error(Location loc, const char* msg);
-
-#endif /* SEMA_H */
+#endif // SEMA_H

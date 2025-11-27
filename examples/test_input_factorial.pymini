@@ -1,0 +1,12 @@
+# Test: Factorial interactivo
+# Usuario ingresa n, programa calcula factorial(n)
+
+def factorial(n):
+    if n <= 1:
+        return 1
+    else:
+        return n * factorial(n - 1)
+
+n = input()
+resultado = factorial(n)
+print(resultado)

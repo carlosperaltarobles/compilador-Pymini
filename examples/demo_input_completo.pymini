@@ -1,0 +1,26 @@
+# Ejemplo demostrando input() con strings y conversión a int
+
+# 1. Entrada de strings (por defecto)
+print('Como te llamas?')
+nombre = input()
+print('Hola ' + nombre + '!')
+
+# 2. Concatenación de strings
+print('Escribe tu apellido:')
+apellido = input()
+nombre_completo = nombre + ' ' + apellido
+print('Tu nombre completo es: ' + nombre_completo)
+
+# 3. Conversión explícita a int para operaciones numéricas
+print('Cuantos años tienes?')
+edad = int(input())
+print('El proximo año tendras:')
+print(edad + 1)
+
+# 4. Suma numérica
+print('Dame dos numeros para sumar:')
+a = int(input())
+b = int(input())
+resultado = a + b
+print('La suma es:')
+print(resultado)

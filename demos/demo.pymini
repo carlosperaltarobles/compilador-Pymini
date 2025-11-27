@@ -1,0 +1,19 @@
+# Programa de Demostración PyMini
+# Calcula el factorial de un número usando recursión
+
+def factorial(n):
+    if n <= 1:
+        return 1
+    else:
+        return n * factorial(n - 1)
+
+# Probar con varios valores
+x = 5
+result = factorial(x)
+print(result)
+
+# También podemos calcular otros factoriales
+y = 7
+result2 = factorial(y)
+print(result2)
+
